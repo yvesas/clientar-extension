@@ -8,8 +8,14 @@
   "action": {
     "default_title": "Clientar", 
     "default_popup": "index.html",
-    "default_icon": "src/assets/clientar_icon.png"
+    "default_icon": "src/assets/icon_128.png"
    },
+   "icons": {
+    "16": "src/assets/icon_128.png",
+    "32": "src/assets/icon_128.png",
+    "48": "src/assets/icon_128.png",
+    "128": "src/assets/icon_128.png"
+  },
   "content_scripts": [
     {
       "run_at" : "document_end",
