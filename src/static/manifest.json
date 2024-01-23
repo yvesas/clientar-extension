@@ -1,14 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Vite,React and ShadowDOM",
   "version": "1.0.0",
+  "name": "Clientar CRM Extension",
+  "description": "Extensão da Clientar CRM para o Chrome",
+  "homepage_url": "https://www.clientarcrm.com.br/",
+  "permissions": ["activeTab", "scripting", "tabs", "storage"],
   "action": {
-    "default_title": "Vite|React", 
-    "default_popup": "index.html"
+    "default_title": "Clientar", 
+    "default_popup": "index.html",
+    "default_icon": "src/assets/clientar_icon.png"
    },
   "content_scripts": [
     {
-      "matches": ["https://www.google.com/*"],
+      "run_at" : "document_end",
+      "matches": ["https://www.google.com/*", "https://www.whatsapp.com/*"],
       "js": ["src/content/google.tsx"]
     }
   ]
