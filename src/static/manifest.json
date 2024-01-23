@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Vite,React and ShadowDOM",
+  "version": "1.0.0",
+  "action": {
+    "default_title": "Vite|React", 
+    "default_popup": "index.html"
+   },
+  "content_scripts": [
+    {
+      "matches": ["https://www.google.com/*"],
+      "js": ["src/content/google.tsx"]
+    }
+  ]
+}
