@@ -19,8 +19,8 @@
   "content_scripts": [
     {
       "run_at" : "document_end",
-      "matches": ["https://www.google.com/*", "https://www.whatsapp.com/*"],
-      "js": ["src/content/google.tsx"]
+      "matches": ["https://web.whatsapp.com/"],
+      "js": ["src/content/constructorContent.js"]
     }
   ]
 }
