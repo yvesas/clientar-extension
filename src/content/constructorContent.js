@@ -11,6 +11,7 @@
 
 function createExtensionApp(){
     let extensionApp = document.createElement('div');
+    extensionApp.style.setProperty("z-index", "100", 'important')
     extensionApp.style.setProperty("position", "fixed", 'important')
     extensionApp.style.setProperty("top", "0", 'important')
     extensionApp.style.setProperty("right", "0", 'important')

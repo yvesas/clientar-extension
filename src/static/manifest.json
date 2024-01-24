@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "version": "1.0.0",
+  "version": "0.0.1",
   "name": "Clientar CRM Extension",
   "description": "Extensão da Clientar CRM para o Chrome",
   "homepage_url": "https://www.clientarcrm.com.br/",
-  "permissions": ["activeTab", "scripting", "tabs", "storage"],
+
   "action": {
     "default_title": "Clientar", 
     "default_popup": "index.html",
@@ -20,7 +20,7 @@
     {
       "run_at" : "document_end",
       "matches": ["https://web.whatsapp.com/"],
-      "js": ["src/content/constructorContent.js"]
+      "js": ["src/content/constructor.tsx"]
     }
   ]
 }
