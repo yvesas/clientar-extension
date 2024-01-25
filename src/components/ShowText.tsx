@@ -7,15 +7,11 @@ export interface ShowTextProps {
 
 export function ShowText({ id, children }: ShowTextProps) {
   return (
-    <div id={id}
-    style={{
-      border: '1px solid black',
-      borderRadius: '5px',
-      minWidth:'200px',
-      minHeight:'100px',
-      padding: '4px'
-    }}>
+    <div className='flex flex-col gap-y-2'>
+    <span className='text-gray-800'>Mensagens copiadas:</span>
+    <article id={id} className='w-[full] min-h-20 p-2 border border-slate-400 rounded-md text-pretty text-slate-700 tracking-tight'>
       {children}
+    </article>
     </div>
   )
 }

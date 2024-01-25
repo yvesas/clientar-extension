@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { Body } from "../components/Body";
+import { Container } from "../components/Container";
 import { Button } from "../components/Button";
 import { ShowText } from "../components/ShowText";
 
@@ -26,10 +26,10 @@ export function AppExt(): React.ReactElement {
 
   return (
     <>
-      <Body>
-        <ShowText id="output" >{copiedText}</ShowText>
-        <Button id="copyButton" onClick={copyAction} >Copiar as mensagens</Button>
-      </Body>
+      <Container>
+      <Button id="copyButton" onClick={copyAction} >Copiar as mensagens</Button>         
+      <ShowText id="output" >{copiedText}</ShowText>        
+      </Container>
     </>
   )
 }

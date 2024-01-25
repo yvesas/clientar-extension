@@ -1,5 +1,12 @@
 
+#crx-root {
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+}
+
 .extensionApp {
+  z-index: 100 !important;
   position: fixed !important;
   top: 0 !important;
   right: 0 !important;
@@ -15,9 +22,4 @@
 .copyButton {
   padding: 5px;
   background-color: white;
-}
-
-.textarea {
-  border: 1px solid black;
-  border-radius: 5px;
 }
