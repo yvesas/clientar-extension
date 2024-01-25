@@ -19,7 +19,7 @@ export function Button({
 }: ButtonProps) {
 
   return (
-    <button id={id} className='p-2 bg-gray-100 hover:bg-sky-700 text-gray-800  border border-slate-400 rounded-lg'
+    <button id={id} className='p-2 bg-gray-300 hover:bg-gray-700 text-gray-800  border border-slate-400 rounded-lg'
       {...rest}
       onClick={onClick} >
       {!loading ? (
