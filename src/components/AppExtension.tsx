@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import { ShadowDom } from "./ShadowDom";
 import { Body } from "./Body";
 import { Button } from "./Button";
-import { TextArea } from "./TextArea";
+import { ShowText } from "./ShowText";
 
 interface AppExtensionProps {
   parentElement: HTMLElement
@@ -32,7 +32,7 @@ export function AppExtension(props:AppExtensionProps): React.ReactElement | null
   return props.parentElement ? (
     <ShadowDom parentElement={props.parentElement} position="afterend" >
       <Body>
-        <TextArea id="output" value={copiedText}/>
+        <ShowText id="output" >{copiedText}</ShowText>
         <Button id="copyButton" onClick={copyAction} >Copiar as mensagens</Button>
       </Body>
     </ShadowDom>

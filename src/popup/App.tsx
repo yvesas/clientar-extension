@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import extensionLogo from './assets/icon_512.png'
-import crmLogo from './assets/clientar_logo.png'
+import extensionLogo from '../assets/icon_512.png'
+import crmLogo from '../assets/clientar_logo.png'
 import './App.css'
 
 function App() {
