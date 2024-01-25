@@ -1,8 +1,10 @@
 import React, {useState,useEffect} from "react";
+import ReactDOM from "react-dom/client";
 import { Container } from "../components/Container";
 import { Button } from "../components/Button";
 import { ShowText } from "../components/ShowText";
 import { queryAsync } from "../shared/queryAsync";
+import CheckboxStyle from "../components/CheckboxStyle";
 
 export function AppExt(): React.ReactElement {
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -10,7 +12,7 @@ export function AppExt(): React.ReactElement {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if(!selectMsgs){
+    if(selectMsgs){
       setErrorMsg(null)
     }       
   }, [selectMsgs])
@@ -27,18 +29,42 @@ export function AppExt(): React.ReactElement {
       }       
   }
 
-  const injectCheckbox = async () => {
-    const ele = await queryAsync('._11JPr.selectable-text.copyable-text')
+  const getText = () => {
+    console.log('GET TEXT!! ')
+  }
+
+  const createContainerCheckBox = (parent:HTMLElement) => {
+    const root = document.createElement("div");
+    root.id = "crx-root-chkbx";
+    parent.appendChild(root);
+
+    parent.style.setProperty("display", "flex", 'important') 
+    parent.style.setProperty("align-items", "center", 'important')       
+    parent.style.setProperty("justify-content", "flex-start", 'important')       
+
+    ReactDOM.createRoot(root).render(
+      <React.StrictMode>
+        <CheckboxStyle checked={false} onChange={getText}/>
+      </React.StrictMode>
+    );
+  }
+
+  const injectCheckbox = async (parent:HTMLElement) => {
+    console.log('parent obj -> ', parent.id)
+
+    const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')
+    rowsChats.forEach((row) => {
+      createContainerCheckBox(row as HTMLElement)
+    });
+
     
-    console.log('obj -> ', ele)
-}
+  }
 
   const showSelectMessages = async() => {
-    const chatArea = await queryAsync("#main"); //document.querySelector('#main')
-    console.log('TEM CHAT AREA? ->', chatArea)
+    const chatArea = await queryAsync("#main")as HTMLElement;    
     if(chatArea){
       setSelectMsgs(true)
-      injectCheckbox()
+      injectCheckbox(chatArea)
     }{
       setErrorMsg('Entre em uma conversa para selecionar as mensagens.')
     }

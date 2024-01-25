@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export async function queryAsync(selector: string): Promise<Element | null> {
+export async function queryAsync(selector: string, parentID?: string): Promise<Element | null | undefined> {
   return new Promise((resolve) => {
-    const element = document.querySelector(selector);
+    let element = null
+    if(parentID){
+      element = document.getElementById(parentID)?.querySelector(selector);
+    }else{
+      element = document.querySelector(selector);
+    }
+    
     resolve(element);
   });
 }
