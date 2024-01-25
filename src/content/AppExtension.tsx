@@ -1,8 +1,8 @@
 import React, {useState} from "react";
-import { ShadowDom } from "./ShadowDom";
-import { Body } from "./Body";
-import { Button } from "./Button";
-import { ShowText } from "./ShowText";
+import { ShadowDom } from "../components/ShadowDom";
+import { Body } from "../components/Body";
+import { Button } from "../components/Button";
+import { ShowText } from "../components/ShowText";
 
 interface AppExtensionProps {
   parentElement: HTMLElement

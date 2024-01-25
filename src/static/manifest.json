@@ -20,7 +20,7 @@
     {
       "run_at" : "document_end",
       "matches": ["https://web.whatsapp.com/"],
-      "js": ["src/content/constructor.tsx"]
+      "js": ["src/content/content.tsx"]
     }
   ]
 }

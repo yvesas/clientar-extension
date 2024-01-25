@@ -1,0 +1,23 @@
+
+.extensionApp {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 320px !important;
+  height: 100% !important;
+  background-color: gray !important;
+  padding: 5px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.copyButton {
+  padding: 5px;
+  background-color: white;
+}
+
+.textarea {
+  border: 1px solid black;
+  border-radius: 5px;
+}

@@ -1,4 +1,4 @@
-import { AppExtension } from "../components/AppExtension";
+import { AppExtension } from "./AppExtension";
 import { render } from "./render";
 
 function insertPage() {
