@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import { Container } from "../components/Container";
 import { Button } from "../components/Button";
 import { ShowText } from "../components/ShowText";
-import { queryAsync } from "../shared/queryAsync";
 import CheckboxStyle from "../components/CheckboxStyle";
+import { generateID } from "../shared/generateID";
 
 export function AppExt(): React.ReactElement {
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export function AppExt(): React.ReactElement {
   }, [selectMsgs])
   
   const copyAction = async () => {
-      const copyText = await queryAsync('._11JPr.selectable-text.copyable-text');//document.querySelector('._11JPr.selectable-text.copyable-text')
+      const copyText = document.querySelector('._11JPr.selectable-text.copyable-text')
       if(copyText && copyText.textContent){
         navigator.clipboard.writeText(copyText.textContent);
         const clipText = await navigator.clipboard.readText()
@@ -29,8 +29,9 @@ export function AppExt(): React.ReactElement {
       }       
   }
 
-  const getText = () => {
-    console.log('GET TEXT!! ')
+  const getText = async (id: string, checked: boolean) => {
+    console.log('GET TEXT!! ', id, checked)
+    
   }
 
 
@@ -45,15 +46,13 @@ export function AppExt(): React.ReactElement {
 
     ReactDOM.createRoot(root).render(
       <React.StrictMode>
-        <CheckboxStyle checked={false} onChange={getText}/>
+        <CheckboxStyle id={generateID()} checked={false} onChange={getText}/>
       </React.StrictMode>
     );
   }
 
   const showSelectMessages = async() => {
-    // const chatArea = await queryAsync('#main [role="application"]')as HTMLElement; 
     const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')    
-    
     if(rowsChats){
       setSelectMsgs(true)
       rowsChats.forEach((row) => {      

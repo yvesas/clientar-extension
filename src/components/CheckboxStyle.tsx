@@ -2,12 +2,13 @@
 import {useState} from "react";
 
 export interface checkBoxProps {
-  // label?: string
+  id: string
   checked?: boolean
-  onChange?: (e:any) => void;
+  onChange?: (id:string, checked:boolean) => void;
 }
 
 const CheckboxStyle = ({
+  id,
   checked = false,
   // label="",
   onChange = () => {},
@@ -17,7 +18,7 @@ const CheckboxStyle = ({
 
   const handleChange = (event:any) => {
     setIsChecked(event.target.checked);
-    onChange(isChecked);
+    onChange(id, event.target.checked);
   };
 
   return (
@@ -35,6 +36,7 @@ const CheckboxStyle = ({
     
     <label className="container">
       <input 
+        id={id}
         type="checkbox" 
         checked={isChecked}  
         onChange={handleChange}
