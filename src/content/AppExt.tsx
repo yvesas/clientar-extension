@@ -33,6 +33,7 @@ export function AppExt(): React.ReactElement {
     console.log('GET TEXT!! ')
   }
 
+
   const createContainerCheckBox = (parent:HTMLElement) => {
     const root = document.createElement("div");
     root.id = "crx-root-chkbx";
@@ -49,22 +50,16 @@ export function AppExt(): React.ReactElement {
     );
   }
 
-  const injectCheckbox = async (parent:HTMLElement) => {
-    console.log('parent obj -> ', parent.id)
-
-    const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')
-    rowsChats.forEach((row) => {
-      createContainerCheckBox(row as HTMLElement)
-    });
-
-    
-  }
-
   const showSelectMessages = async() => {
-    const chatArea = await queryAsync("#main")as HTMLElement;    
-    if(chatArea){
+    // const chatArea = await queryAsync('#main [role="application"]')as HTMLElement; 
+    const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')    
+    
+    if(rowsChats){
       setSelectMsgs(true)
-      injectCheckbox(chatArea)
+      rowsChats.forEach((row) => {      
+        row.querySelector('#crx-root-chkbx')?.remove() //remove duplicate items.
+        createContainerCheckBox(row as HTMLElement)
+      });    
     }{
       setErrorMsg('Entre em uma conversa para selecionar as mensagens.')
     }
