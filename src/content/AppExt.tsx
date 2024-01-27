@@ -6,6 +6,11 @@ import { ShowText } from "../components/ShowText";
 import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 
+interface MessageObject {
+  title:string | null | undefined,
+  message: string | null | undefined
+}
+
 export function AppExt(): React.ReactElement {
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [selectMsgs, setSelectMsgs] = useState(false)
@@ -31,11 +36,42 @@ export function AppExt(): React.ReactElement {
 
   const getText = async (id: string, checked: boolean) => {
     console.log('GET TEXT!! ', id, checked)
-    
+
+    const msgObj:MessageObject = {
+      title: null,
+      message: null
+    }
+
+    const selectorCopyableText = '[extapp="'+"ext-"+ id + '"] .copyable-text';
+    const copyableTextNodes = document.querySelectorAll(selectorCopyableText)
+    console.log('> copyableTextNodes ->', copyableTextNodes)
+
+    copyableTextNodes.forEach((node) => {  
+      if(node.nodeName == 'DIV'){
+        msgObj.title = node.attributes.getNamedItem('data-pre-plain-text')?.value;        
+      }
+      if(node.localName == 'span'){
+        msgObj.message = node.textContent 
+        const span = node.firstChild as HTMLElement
+        const text = span.innerHTML
+        
+        // console.log('firstChild html > ', firstChild.innerHTML);        
+        for (const child of span.children) {
+          
+        }
+
+        // const children = node.children;
+        // console.log('filhos do NODE span > ' ,children);
+      }
+      if(node.tagName=="IMG"){
+        msgObj.message += " - "+node.attributes.getNamedItem('data-plain-text')?.value;
+      }
+    })
+    console.log('THIS TEXT ->', msgObj.title, msgObj.message)
   }
 
 
-  const createContainerCheckBox = (parent:HTMLElement) => {
+  const createContainerCheckBox = (parent:HTMLElement, uniqueID:string) => {
     const root = document.createElement("div");
     root.id = "crx-root-chkbx";
     parent.appendChild(root);
@@ -46,7 +82,7 @@ export function AppExt(): React.ReactElement {
 
     ReactDOM.createRoot(root).render(
       <React.StrictMode>
-        <CheckboxStyle id={generateID()} checked={false} onChange={getText}/>
+        <CheckboxStyle id={uniqueID} checked={false} onChange={getText}/>
       </React.StrictMode>
     );
   }
@@ -57,7 +93,11 @@ export function AppExt(): React.ReactElement {
       setSelectMsgs(true)
       rowsChats.forEach((row) => {      
         row.querySelector('#crx-root-chkbx')?.remove() //remove duplicate items.
-        createContainerCheckBox(row as HTMLElement)
+        
+        const uniqueID = generateID();
+        row.setAttribute("extapp", "ext-"+uniqueID)
+
+        createContainerCheckBox(row as HTMLElement, uniqueID)
       });    
     }{
       setErrorMsg('Entre em uma conversa para selecionar as mensagens.')
