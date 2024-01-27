@@ -34,9 +34,8 @@ const CheckboxStyle = ({
     //   {/* <label style={{ marginLeft: 10 }}>{label}</label> */}
     // </div>
     
-    <label className="container">
-      <input 
-        id={id}
+    <label id={id} className="container">
+      <input         
         type="checkbox" 
         checked={isChecked}  
         onChange={handleChange}
