@@ -7,69 +7,110 @@ import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 
 interface MessageObject {
+  id: string
   title:string | null | undefined,
-  message: string | null | undefined
+  message: string | null
 }
 
 export function AppExt(): React.ReactElement {
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [selectMsgs, setSelectMsgs] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const [messages, setMessages] = useState<MessageObject[]>([]);
+  
   useEffect(() => {
     if(selectMsgs){
       setErrorMsg(null)
     }       
   }, [selectMsgs])
+
+  useEffect(() => {
+    console.log('Array Messages: ', messages)     
+  }, [messages])
+
+
+  const addMessage = (messageObject: MessageObject) => {
+    setMessages([...messages, messageObject]);
+  };
+  const removeMessage = (id: string) => {
+    setMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
+  };
+  
+
+  const replaceEmoticon = async (text: string | null, altValue: string | undefined): Promise<string | null> => {                
+    if(!altValue){
+      return text
+    }
+    if(!text){
+      return text
+    }
+    return new Promise((resolve, reject) => {
+      try {
+        const newText = text.replace(
+          /<img[^>]*?alt="(.+?)"[^>]*?>/i,
+          (match, alt) => {
+            if (alt === altValue) {
+              return ` ${altValue} `;
+            } else {
+              return match;
+            }
+          },
+        );
+        resolve(newText); 
+    } catch (error) {
+      reject(error); 
+    }
+    });
+  }
   
   const copyAction = async () => {
-      const copyText = document.querySelector('._11JPr.selectable-text.copyable-text')
-      if(copyText && copyText.textContent){
-        navigator.clipboard.writeText(copyText.textContent);
+    console.log('Array Messages: ', messages)     
+
+      if(messages && messages.length > 0){
+        // messages.forEach(item => {          
+        // });
+        const msg =  messages[0].title+' '+messages[0].message
+        navigator.clipboard.writeText(msg);
         const clipText = await navigator.clipboard.readText()
         setCopiedText(clipText)
-        // console.log('read clip text ->>', clipText)
-        // console.log('copyText ->>', copyText.textContent)
         setSelectMsgs(false)
       }       
   }
 
-  const getText = async (id: string, checked: boolean) => {
-    console.log('GET TEXT!! ', id, checked)
-
-    const msgObj:MessageObject = {
-      title: null,
-      message: null
-    }
-
-    const selectorCopyableText = '[extapp="'+"ext-"+ id + '"] .copyable-text';
-    const copyableTextNodes = document.querySelectorAll(selectorCopyableText)
-    console.log('> copyableTextNodes ->', copyableTextNodes)
-
-    copyableTextNodes.forEach((node) => {  
-      if(node.nodeName == 'DIV'){
-        msgObj.title = node.attributes.getNamedItem('data-pre-plain-text')?.value;        
+  const getText = async (id: string, checked: boolean) => { 
+    if(!checked){
+      removeMessage(id)
+      
+    }else{  
+      const msgObj:MessageObject = {
+        id: id,
+        title: null,
+        message: null
       }
-      if(node.localName == 'span'){
-        msgObj.message = node.textContent 
-        const span = node.firstChild as HTMLElement
-        const text = span.innerHTML
-        
-        // console.log('firstChild html > ', firstChild.innerHTML);        
-        for (const child of span.children) {
+      const selectorCopyableText = '[extapp="'+"ext-"+ id + '"] .copyable-text';
+      const copyableTextNodes = document.querySelectorAll(selectorCopyableText)    
+
+      copyableTextNodes.forEach(async (node) => {  
+        if(node.nodeName == 'DIV'){
+          msgObj.title = node.attributes.getNamedItem('data-pre-plain-text')?.value;        
+        }
+        if(node.localName == 'span'){
+          const spanText = node.firstChild as HTMLElement
+          msgObj.message = spanText.innerHTML
+          
+          for (let index = 0; index < spanText.children.length; index++) {
+            const child = spanText.children[index] as HTMLElement
+            if(child.tagName=="IMG" ){
+              const altAttribute = child.attributes.getNamedItem('alt')?.value;            
+              msgObj.message = await replaceEmoticon(msgObj.message, altAttribute)                                    
+            }
+          }
           
         }
-
-        // const children = node.children;
-        // console.log('filhos do NODE span > ' ,children);
-      }
-      if(node.tagName=="IMG"){
-        msgObj.message += " - "+node.attributes.getNamedItem('data-plain-text')?.value;
-      }
-    })
-    console.log('THIS TEXT ->', msgObj.title, msgObj.message)
+      })
+      addMessage(msgObj) 
+    }   
   }
-
 
   const createContainerCheckBox = (parent:HTMLElement, uniqueID:string) => {
     const root = document.createElement("div");
