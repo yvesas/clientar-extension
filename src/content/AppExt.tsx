@@ -7,6 +7,7 @@ import { ShowText } from "../components/ShowText";
 import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 import { IMessageObject } from "../shared/IMessageObject";
+import { sortMessages } from "../shared/sortMessages";
 
 
 export function AppExt(): React.ReactElement {
@@ -21,15 +22,13 @@ export function AppExt(): React.ReactElement {
     }       
   }, [selectMsgs])
 
-  const addMessage = (messageObject: IMessageObject) => {
-    // setMessages([...messages, messageObject]);
+  const addMessage = (messageObject: IMessageObject) => {    
     setMessages(old => [...old, messageObject]);
   };
   const removeMessage = (id: string) => {
     setMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
   };
   
-
   const replaceEmoticon = async (text: string | null, altValue: string | undefined): Promise<string | null> => {                
     if(!altValue){
       return text
@@ -56,26 +55,26 @@ export function AppExt(): React.ReactElement {
     });
   }
   
-  const copyAction = async () => {
-    console.log('Array Messages: ', messages)     
-
+  const copyAction = async () => {  
       if(messages && messages.length > 0){
-        // const messagesOrdered = await sortMessages(messages)
-        // console.log('--> qual messagesOrdered? ', messagesOrdered)
+        const messagesOrdered = await sortMessages(messages)
+        console.log('--> messages', messages)
+        console.log('-->> messages Ordered ', messagesOrdered)
+        
         let fullText =  ''
-        messages.forEach((item:any, index:any) => { 
+        messagesOrdered.forEach((item:any, index:any) => { 
           if(index>0){
             fullText +=  item.title+' '+item.message + '\n'
           }else{
             fullText =  item.title+' '+item.message + '\n'
           }          
-        });
-        console.log('--> qual fullText? ', fullText)
+        });        
         navigator.clipboard.writeText(fullText);
         const clipText = await navigator.clipboard.readText()
-        setCopiedText(clipText)
-        console.log('--> vai setSelectMsgs?')
-        setSelectMsgs(false)
+        if(clipText){
+          setCopiedText(clipText)        
+          removeSelectMessages()
+        }        
       }       
   }
 
@@ -144,6 +143,17 @@ export function AppExt(): React.ReactElement {
       });    
     }{
       setErrorMsg('Entre em uma conversa para selecionar as mensagens.')
+    }
+  }
+
+  const removeSelectMessages = () => {
+    const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')    
+    if(rowsChats){
+      setSelectMsgs(false)
+      setMessages([])
+      rowsChats.forEach((row) => {      
+        row.querySelector('#crx-root-chkbx')?.remove()              
+      });    
     }
   }
 
