@@ -5,18 +5,16 @@ import { Button } from "../components/Button";
 import { ShowText } from "../components/ShowText";
 import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
+import { IMessageObject } from "../shared/IMessageObject";
+// import { sortMessages } from "../shared/sortMessages";
 
-interface MessageObject {
-  id: string
-  title:string | null | undefined,
-  message: string | null
-}
+
 
 export function AppExt(): React.ReactElement {
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [selectMsgs, setSelectMsgs] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [messages, setMessages] = useState<MessageObject[]>([]);
+  const [messages, setMessages] = useState<IMessageObject[]>([]);
   
   useEffect(() => {
     if(selectMsgs){
@@ -24,13 +22,9 @@ export function AppExt(): React.ReactElement {
     }       
   }, [selectMsgs])
 
-  useEffect(() => {
-    console.log('Array Messages: ', messages)     
-  }, [messages])
-
-
-  const addMessage = (messageObject: MessageObject) => {
-    setMessages([...messages, messageObject]);
+  const addMessage = (messageObject: IMessageObject) => {
+    // setMessages([...messages, messageObject]);
+    setMessages(old => [...old, messageObject]);
   };
   const removeMessage = (id: string) => {
     setMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
@@ -67,12 +61,21 @@ export function AppExt(): React.ReactElement {
     console.log('Array Messages: ', messages)     
 
       if(messages && messages.length > 0){
-        // messages.forEach(item => {          
-        // });
-        const msg =  messages[0].title+' '+messages[0].message
-        navigator.clipboard.writeText(msg);
+        // const messagesOrdered = await sortMessages(messages)
+        // console.log('--> qual messagesOrdered? ', messagesOrdered)
+        let fullText =  ''
+        messages.forEach((item, index) => { 
+          if(index>0){
+            fullText +=  item.title+' '+item.message + '\n'
+          }else{
+            fullText =  item.title+' '+item.message + '\n'
+          }          
+        });
+        console.log('--> qual fullText? ', fullText)
+        navigator.clipboard.writeText(fullText);
         const clipText = await navigator.clipboard.readText()
         setCopiedText(clipText)
+        console.log('--> vai setSelectMsgs?')
         setSelectMsgs(false)
       }       
   }
@@ -82,7 +85,7 @@ export function AppExt(): React.ReactElement {
       removeMessage(id)
       
     }else{  
-      const msgObj:MessageObject = {
+      const msgObj:IMessageObject = {
         id: id,
         title: null,
         message: null
