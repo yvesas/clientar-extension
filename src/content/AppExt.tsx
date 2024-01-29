@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {useState,useEffect} from "react";
 import ReactDOM from "react-dom/client";
 import { Container } from "../components/Container";
@@ -6,8 +7,6 @@ import { ShowText } from "../components/ShowText";
 import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 import { IMessageObject } from "../shared/IMessageObject";
-// import { sortMessages } from "../shared/sortMessages";
-
 
 
 export function AppExt(): React.ReactElement {
@@ -64,7 +63,7 @@ export function AppExt(): React.ReactElement {
         // const messagesOrdered = await sortMessages(messages)
         // console.log('--> qual messagesOrdered? ', messagesOrdered)
         let fullText =  ''
-        messages.forEach((item, index) => { 
+        messages.forEach((item:any, index:any) => { 
           if(index>0){
             fullText +=  item.title+' '+item.message + '\n'
           }else{
