@@ -2,19 +2,42 @@
 
 import { IMessageObject } from "./IMessageObject";
 
-export function sortMessages(messages: any, type = "DESC"): Promise<IMessageObject[]> {
+function formatTimestamp(timestampString: string) {
+  if(timestampString){  
+    const [time, date] = timestampString.split(', ');
+    const [hours, minutes] = time.split(':');
+    const [day, month, year] = date.split('/');
+    return `${year}-${month}-${day}T${hours}:${minutes}:00`;
+  }else{
+    return '';
+  }
+}
+
+export function sortMessages(messages: any, type = "ASC"): Promise<IMessageObject[]> {  
   return new Promise((resolve, reject) => {
     try {
-      messages.sort((a:any, b:any) => {
-        console.log('>> o0 values ', a.title, b)
-        const timestampA = Date.parse((a.title||'').match(/\[([^[\]]*)\]/)[1]);
-        const timestampB = Date.parse((b.title||'').match(/\[([^[\]]*)\]/)[1]);
+      messages.sort((a:any, b:any) => { 
+        
+          
+        const A_matches = a.title.match(/\[([^[\]]*)\]/)?.[1];
+        const A_formatted: string = formatTimestamp(A_matches)
+        const timestampA = A_formatted ? Date.parse(A_formatted) : 0;
+
+        const B_matches = b.title.match(/\[([^[\]]*)\]/)?.[1];
+        const B_formatted: string = formatTimestamp(B_matches)
+        const timestampB = B_formatted ? Date.parse(B_formatted) : 0;
+              
+
+        console.log('>> o0 values ', type, a.title, b.title)
+        console.log('>> Matches >>', A_matches, B_matches)
+        console.log('>> formatted >>', A_formatted, B_formatted)
+        console.log('>> timestamp >>', timestampA, timestampB)
 
         switch (type) {
           case "ASC":
-            return timestampA - timestampB;
+            return Number(timestampA) - Number(timestampB);
           case "DESC":
-            return timestampB - timestampA;
+            return Number(timestampB) - Number(timestampA);
           default:
             return messages;
             // throw new Error("O tipo de ordenação deve ser ASC ou DESC");
@@ -27,28 +50,3 @@ export function sortMessages(messages: any, type = "DESC"): Promise<IMessageObje
     }
   });
 }
-
-// export function sortMessages(messages, type = "ASC") {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       messages.sort((a, b) => {
-//         const timestampA = Date.parse(a.match(/\[([^\[\]]*)\]/)[1]);
-//         const timestampB = Date.parse(b.match(/\[([^\[\]]*)\]/)[1]);
-
-//         switch (type) {
-//           case "ASC":
-//             return timestampA - timestampB;
-//           case "DESC":
-//             return timestampB - timestampA;
-//           default:
-//             return messages;
-//             // throw new Error("O tipo de ordenação deve ser ASC ou DESC");
-//         }
-//       });
-//       resolve(messages);
-//     } catch (err) {
-//       console.error('> Failed ordered messages.', err);
-//       reject(messages);
-//     }
-//   });
-// }
