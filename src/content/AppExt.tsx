@@ -58,7 +58,6 @@ export function AppExt(): React.ReactElement {
   const copyAction = async () => {  
       if(messages && messages.length > 0){
         const messagesOrdered = await sortMessages(messages)
-        console.log('--> messages', messages)
         console.log('-->> messages Ordered ', messagesOrdered)
         
         let fullText =  ''
