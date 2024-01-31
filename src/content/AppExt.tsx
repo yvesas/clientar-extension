@@ -11,6 +11,7 @@ import { sortMessages } from "../shared/sortMessages";
 
 
 export function AppExt(): React.ReactElement {
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [selectMsgs, setSelectMsgs] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -20,7 +21,22 @@ export function AppExt(): React.ReactElement {
     if(selectMsgs){
       setErrorMsg(null)
     }       
-  }, [selectMsgs])
+  }, [selectMsgs, isFirstRender])
+
+  const addEventClearAll = () => {
+    if(isFirstRender){
+      const menuWpElements = document.querySelectorAll("#app ._3RGKj .g0rxnol2"); 
+      if(menuWpElements && menuWpElements.length>0){        
+        menuWpElements.forEach((ele) => { 
+          ele.addEventListener("click", () => {
+            cancelAction()
+          });
+         })
+        setIsFirstRender(false)
+      }
+    }    
+  }
+  addEventClearAll()
 
   const addMessage = (messageObject: IMessageObject) => { 
     if(messageObject.id && messageObject.title && messageObject.message){
@@ -121,20 +137,25 @@ export function AppExt(): React.ReactElement {
           msgObj.title = node.attributes.getNamedItem('data-pre-plain-text')?.value;        
         }
         if(node.localName == 'span'){
-          const spanText = node.firstChild as HTMLElement
-          msgObj.message = spanText.innerHTML
-          
-          for (let index = 0; index < spanText.children.length; index++) {
-            const child = spanText.children[index] as HTMLElement
-            if(child.tagName=="IMG" ){
-              const altAttribute = child.attributes.getNamedItem('alt')?.value;            
-              msgObj.message = await replaceEmoticon(msgObj.message, altAttribute)                                    
-            }
-            if(child.tagName=="A" ){
-              const hrefAttribute = child.attributes.getNamedItem('href')?.value;                          
-              msgObj.message = await replaceLinkSource(msgObj.message, hrefAttribute)  
+          const elementText = node.firstChild as HTMLElement
+          msgObj.message = elementText.innerHTML
+
+          if(elementText.localName == 'span'){
+            for (let index = 0; index < elementText.children.length; index++) {
+              const child = elementText.children[index] as HTMLElement
+              if(child.tagName=="IMG" ){
+                const altAttribute = child.attributes.getNamedItem('alt')?.value;            
+                msgObj.message = await replaceEmoticon(msgObj.message, altAttribute)                                    
+              }
+              if(child.tagName=="A" ){
+                const hrefAttribute = child.attributes.getNamedItem('href')?.value;                          
+                msgObj.message = await replaceLinkSource(msgObj.message, hrefAttribute)  
+              }
             }
           }
+          
+          
+          
           
         }
       })
@@ -197,7 +218,10 @@ export function AppExt(): React.ReactElement {
   }
 
   const cancelAction = () => {
-    removeSelectMessages()
+    removeSelectMessages();
+    const output = document.querySelector('#output') ? document.querySelector('#output'):null
+    if(output)
+    output.innerHTML = "";
   }
 
   return (
