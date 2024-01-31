@@ -61,10 +61,7 @@ export function AppExt(): React.ReactElement {
     }
     if (!text) {
       return text;
-    }
-    //v1 /<a[^>]*?\s*href="(.+?)"[^>]*?>\.*?<\/a>/i
-    //v2 `/<a[^>]*?\s*href="(.+?)"[^>]*?>\s*\n?\s*(?:.*?)</a>/i`
-
+    }  
     return new Promise((resolve, reject) => {
       try {
         const newText = text.replace(/<a[^>]*?\s*href="(.+?)"[^>]*?>\s*\n?\s*(?:.*?)<\/a>/i,
