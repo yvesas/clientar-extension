@@ -22,8 +22,10 @@ export function AppExt(): React.ReactElement {
     }       
   }, [selectMsgs])
 
-  const addMessage = (messageObject: IMessageObject) => {    
-    setMessages(old => [...old, messageObject]);
+  const addMessage = (messageObject: IMessageObject) => { 
+    if(messageObject.id && messageObject.title && messageObject.message){
+      setMessages(old => [...old, messageObject]);
+    }           
   };
   const removeMessage = (id: string) => {
     setMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
@@ -66,7 +68,6 @@ export function AppExt(): React.ReactElement {
       try {
         const newText = text.replace(/<a[^>]*?\s*href="(.+?)"[^>]*?>\s*\n?\s*(?:.*?)<\/a>/i,
             (match, href) => {
-            console.log('o que tem aqui: ', match, href);
             if (href.trim() === hrefValue.trim()) {
               return ` ${hrefValue.trim()} `;
             } else {
@@ -83,9 +84,7 @@ export function AppExt(): React.ReactElement {
   
   const copyAction = async () => {  
       if(messages && messages.length > 0){
-        const messagesOrdered = await sortMessages(messages)
-        console.log('-->> messages Ordered ', messagesOrdered)
-        
+        const messagesOrdered = await sortMessages(messages)      
         let fullText =  ''
         messagesOrdered.forEach((item:any, index:any) => { 
           if(index>0){
@@ -115,7 +114,7 @@ export function AppExt(): React.ReactElement {
       }
       const selectorCopyableText = '[extapp="'+"ext-"+ id + '"] .copyable-text';
       const copyableTextNodes = document.querySelectorAll(selectorCopyableText)    
-      console.log('copyableTextNodes -> ', copyableTextNodes)
+      // console.log('copyableTextNodes -> ', copyableTextNodes)
 
       copyableTextNodes.forEach(async (node) => {  
         if(node.nodeName == 'DIV'){
@@ -132,12 +131,8 @@ export function AppExt(): React.ReactElement {
               msgObj.message = await replaceEmoticon(msgObj.message, altAttribute)                                    
             }
             if(child.tagName=="A" ){
-              console.log('A tags -> ', child)
               const hrefAttribute = child.attributes.getNamedItem('href')?.value;                          
               msgObj.message = await replaceLinkSource(msgObj.message, hrefAttribute)  
-
-              console.log('href A -> ', hrefAttribute)
-              console.log('msgObj.message -> ', msgObj.message)
             }
           }
           
@@ -165,7 +160,7 @@ export function AppExt(): React.ReactElement {
 
   const showSelectMessages = async() => {
     const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')    
-    if(rowsChats){
+    if(rowsChats && rowsChats.length>0){
       setSelectMsgs(true)
       rowsChats.forEach((row) => {      
         row.querySelector('#crx-root-chkbx')?.remove() //remove duplicate items.
@@ -191,17 +186,39 @@ export function AppExt(): React.ReactElement {
     }
   }
 
+  const selectAllMessages = () => {
+    const checkboxes = document.querySelectorAll('#main [data-extapp="chckbx"]');
+    if(checkboxes){
+      checkboxes.forEach((box) => {
+        (box as HTMLElement).click();
+      })
+    }
+
+  }
+
+  const cancelAction = () => {
+    removeSelectMessages()
+  }
+
   return (
     <>
       <Container>
       {selectMsgs ? 
-      (<Button id="copyButton" onClick={copyAction} >Copiar as mensagens</Button>) 
+      (<div className="flex flex-col gap-y-4">
+        <Button id="selectAll" onClick={selectAllMessages} >Selecionar mensagens recentes</Button>
+        
+        {messages && messages.length>0 &&
+        (<Button id="copyButton" onClick={copyAction} >Copiar as mensagens</Button>)
+        }
+        
+      </div>) 
       :
       (<Button id="selectMsgBtn" onClick={showSelectMessages} >Selecionar mensagens</Button>)
       }
       {errorMsg && (<span className="text-sm text-pretty text-red-500 tracking-wide">{errorMsg}</span>) }
 
-      <ShowText id="output" >{copiedText}</ShowText>        
+      <ShowText id="output" >{copiedText}</ShowText>
+      <Button id="cancel" typeButton="danger" onClick={cancelAction} >Apagar mensagens</Button>       
       </Container>
     </>
   )

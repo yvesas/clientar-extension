@@ -70,8 +70,8 @@
   height: 20px;
   width: 20px;
   background-color: #fff5ee;
-  border: solid #fff5ee;
-  border-width: 1px;
+  border: solid #ff6a00;
+  border-width: 2px;
   border-radius: 4px;
 }
 
@@ -83,7 +83,9 @@
 /* When the checkbox is checked, add a blue background */
 .container input:checked ~ .checkmark {
   background-color: #0334fb;
-  border: none;
+  border: solid #0334fb;
+  border-width: 2px;
+  border-radius: 4px;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */

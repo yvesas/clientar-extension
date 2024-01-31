@@ -17,12 +17,11 @@ export function sortMessages(messages: any, type = "ASC"): Promise<IMessageObjec
   return new Promise((resolve, reject) => {
     try {
       messages.sort((a:any, b:any) => { 
-                  
-        const A_matches = a.title.match(/\[([^[\]]*)\]/)?.[1];
+        const A_matches = (a.title || '').match(/\[([^[\]]*)\]/)?.[1];
         const A_formatted: string = formatTimestamp(A_matches)
         const timestampA = A_formatted ? Date.parse(A_formatted) : 0;
-
-        const B_matches = b.title.match(/\[([^[\]]*)\]/)?.[1];
+        
+        const B_matches = (b.title || '').match(/\[([^[\]]*)\]/)?.[1];
         const B_formatted: string = formatTimestamp(B_matches)
         const timestampB = B_formatted ? Date.parse(B_formatted) : 0;  
         

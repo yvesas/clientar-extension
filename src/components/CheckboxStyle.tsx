@@ -21,20 +21,8 @@ const CheckboxStyle = ({
     onChange(id, event.target.checked);
   };
 
-  return (
-    // <div style={{ display: "flex", alignItems: "center" }}>
-    // <div className={["checkbox", checkedStyle].join(" ")} >    
-    // {/* <div className="checkbox" >     */}
-    //   <input
-    //     className={["", checkedStyle].join(" ")}
-    //     type="checkbox"
-    //     checked={isChecked}
-    //     onChange={handleChange}
-    //   />
-    //   {/* <label style={{ marginLeft: 10 }}>{label}</label> */}
-    // </div>
-    
-    <label id={id} className="container">
+  return (    
+    <label id={id} data-extapp="chckbx" className="container">
       <input         
         type="checkbox" 
         checked={isChecked}  
@@ -42,15 +30,6 @@ const CheckboxStyle = ({
       />
       <span className="checkmark"></span>
     </label>
-
-    // <label className="checkboxContainer">
-    //   <input 
-    //     type="checkbox" 
-    //     checked={isChecked}  
-    //     onChange={handleChange}
-    //   />
-    //   <span className="checkmark"></span>
-    // </label>
   );
 };
 
