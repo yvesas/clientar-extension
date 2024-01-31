@@ -54,6 +54,35 @@ export function AppExt(): React.ReactElement {
     }
     });
   }
+
+  const replaceLinkSource = async (text: string | null, hrefValue: string | undefined): Promise<string | null> => {    
+    if (!hrefValue) {
+      return text;
+    }
+    if (!text) {
+      return text;
+    }
+    //v1 /<a[^>]*?\s*href="(.+?)"[^>]*?>\.*?<\/a>/i
+    //v2 `/<a[^>]*?\s*href="(.+?)"[^>]*?>\s*\n?\s*(?:.*?)</a>/i`
+
+    return new Promise((resolve, reject) => {
+      try {
+        const newText = text.replace(/<a[^>]*?\s*href="(.+?)"[^>]*?>\s*\n?\s*(?:.*?)<\/a>/i,
+            (match, href) => {
+            console.log('o que tem aqui: ', match, href);
+            if (href.trim() === hrefValue.trim()) {
+              return ` ${hrefValue.trim()} `;
+            } else {
+              return match;
+            }
+          }
+        );
+        resolve(newText);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
   
   const copyAction = async () => {  
       if(messages && messages.length > 0){
@@ -89,6 +118,7 @@ export function AppExt(): React.ReactElement {
       }
       const selectorCopyableText = '[extapp="'+"ext-"+ id + '"] .copyable-text';
       const copyableTextNodes = document.querySelectorAll(selectorCopyableText)    
+      console.log('copyableTextNodes -> ', copyableTextNodes)
 
       copyableTextNodes.forEach(async (node) => {  
         if(node.nodeName == 'DIV'){
@@ -103,6 +133,14 @@ export function AppExt(): React.ReactElement {
             if(child.tagName=="IMG" ){
               const altAttribute = child.attributes.getNamedItem('alt')?.value;            
               msgObj.message = await replaceEmoticon(msgObj.message, altAttribute)                                    
+            }
+            if(child.tagName=="A" ){
+              console.log('A tags -> ', child)
+              const hrefAttribute = child.attributes.getNamedItem('href')?.value;                          
+              msgObj.message = await replaceLinkSource(msgObj.message, hrefAttribute)  
+
+              console.log('href A -> ', hrefAttribute)
+              console.log('msgObj.message -> ', msgObj.message)
             }
           }
           
