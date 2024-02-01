@@ -27,19 +27,17 @@ function insertPage() {
 
   const crmComponent = document.querySelectorAll("body.main"); 
   console.log('ACHOU main -> ', crmComponent)
-  if (crmComponent) {
-    const root = document.createElement("div");
-    root.id = "crx-root";
-    
+  // if (crmComponent) {
+  //   const root = document.createElement("div");
+  //   root.id = "crx-root";    
     // crmComponent.appendChild(root);
 
-    ReactDOM.createRoot(root).render(
-      <React.StrictMode>
-        <div>BTN COLAR</div>
-      </React.StrictMode>
-    );  
-  
-  }
+    // ReactDOM.createRoot(root).render(
+    //   <React.StrictMode>
+    //     <div>BTN COLAR</div>
+    //   </React.StrictMode>
+    // );    
+  // }
 
   console.log('>>>> CONTENT SCRIPT runs ---')
 }
