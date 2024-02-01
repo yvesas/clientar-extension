@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "../index.css";
 import { AppExt } from "./AppExt";
+import { AppExtCRM } from "./AppExtCRM";
 
 
 function insertPage() {
@@ -24,27 +25,41 @@ function insertPage() {
   }
 
 
-  
-  
   if(window.location.hostname.includes("clientarcrm")){
-    // const crmComponent = document.querySelectorAll("body.main textarea"); 
-    const crmComponent = document.querySelector("body.main"); 
-    console.log('>> ACHOU clientarcrm > main -> ', crmComponent)
-    if (crmComponent) {
+    // const crmComponentOld_specific = document.querySelectorAll("body.main textarea"); // get old CRM
+    // const crmComponentNew_specific = document.querySelectorAll("div.editor__button button span"); // get new CRM
+    
+    const crmComponentNew = document.querySelector("#main-wrapper") as HTMLElement; 
+    const crmComponentOld = document.querySelector("body.main") as HTMLElement; 
+    // console.log('>> ACHOU clientar crm OLD --> ', crmComponentOld)
+    
+    if (crmComponentOld) {
       const root = document.createElement("div");
       root.id = "crx-root";    
-      crmComponent.appendChild(root);
+      crmComponentOld.appendChild(root);
 
       ReactDOM.createRoot(root).render(
         <React.StrictMode>
-          <div>BTN COLAR</div>
+          <AppExtCRM version="OLD"/>
         </React.StrictMode>
       );    
+
+    }else if(crmComponentNew){
+      const root = document.createElement("div");
+      root.id = "crx-root";    
+      crmComponentNew.appendChild(root);
+
+      crmComponentNew.style.setProperty("max-width", "100%", 'important') 
+      crmComponentNew.style.setProperty("width", "calc(100% - 320px)", 'important')
+
+      ReactDOM.createRoot(root).render(
+        <React.StrictMode>
+          <AppExtCRM version="NEW"/> 
+        </React.StrictMode>
+      ); 
     }
 
-  }
-  
-  console.log('>>>> CONTENT SCRIPT runs ---')
+  }  
 }
 
 insertPage();
