@@ -7,13 +7,13 @@
 
   "action": {
     "default_title": "Clientar",     
-    "default_icon": "src/assets/clientar_icon.png"
+    "default_icon": "src/assets/icon_128x128.png"
    },
    "icons": {
-    "16": "src/assets/clientar_icon.png",
-    "32": "src/assets/clientar_icon.png",
-    "48": "src/assets/clientar_icon.png",
-    "128": "src/assets/clientar_icon.png"
+    "16": "src/assets/icon_128x128.png",
+    "32": "src/assets/icon_128x128.png",
+    "48": "src/assets/icon_128x128.png",
+    "128": "src/assets/icon_128x128.png"
   },
   "content_scripts": [
     {
