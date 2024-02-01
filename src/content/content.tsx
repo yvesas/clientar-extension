@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "../index.css";
 import { AppExt } from "./AppExt";
-// import { AppExtension } from "./AppExtension";
 
 
 function insertPage() {
@@ -17,12 +16,32 @@ function insertPage() {
 
     ReactDOM.createRoot(root).render(
       <React.StrictMode>
-        <AppExt />
-        {/* <AppExtension parentElement={appComponent} /> */}
+        <AppExt />        
       </React.StrictMode>
-    );
-    
+    );    
   }
+
+
+  
+  // const crmComponent = document.querySelectorAll("body.main textarea"); 
+
+  const crmComponent = document.querySelectorAll("body.main"); 
+  console.log('ACHOU main -> ', crmComponent)
+  if (crmComponent) {
+    const root = document.createElement("div");
+    root.id = "crx-root";
+    
+    // crmComponent.appendChild(root);
+
+    ReactDOM.createRoot(root).render(
+      <React.StrictMode>
+        <div>BTN COLAR</div>
+      </React.StrictMode>
+    );  
+  
+  }
+
+  console.log('>>>> CONTENT SCRIPT runs ---')
 }
 
 insertPage();
