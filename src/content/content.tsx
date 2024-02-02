@@ -38,25 +38,28 @@ function insertPage() {
       root.id = "crx-root";    
       crmComponentOld.appendChild(root);
 
-      ReactDOM.createRoot(root).render(
-        <React.StrictMode>
-          <AppExtCRM version="OLD"/>
-        </React.StrictMode>
-      );    
+      setTimeout(function() {
+        ReactDOM.createRoot(root).render(
+          <React.StrictMode>
+            <AppExtCRM version="OLD"/> 
+          </React.StrictMode>
+        ); 
+      }, 2500);   
 
     }else if(crmComponentNew){
       const root = document.createElement("div");
       root.id = "crx-root";    
       crmComponentNew.appendChild(root);
-
-      crmComponentNew.style.setProperty("max-width", "100%", 'important') 
-      crmComponentNew.style.setProperty("width", "calc(100% - 320px)", 'important')
-
-      ReactDOM.createRoot(root).render(
-        <React.StrictMode>
-          <AppExtCRM version="NEW"/> 
-        </React.StrictMode>
-      ); 
+      // crmComponentNew.style.setProperty("max-width", "100%", 'important') 
+      // crmComponentNew.style.setProperty("width", "calc(100% - 320px)", 'important')
+      setTimeout(function() {
+        ReactDOM.createRoot(root).render(
+          <React.StrictMode>
+            <AppExtCRM version="NEW"/> 
+          </React.StrictMode>
+        ); 
+      }, 2500);
+     
     }
 
   }  

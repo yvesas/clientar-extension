@@ -29,7 +29,7 @@ export function AppExt(): React.ReactElement {
       if(menuWpElements && menuWpElements.length>0){        
         menuWpElements.forEach((ele) => { 
           ele.addEventListener("click", () => {
-            cancelAction()
+            clearDataAction()
           });
          })
         setIsFirstRender(false)
@@ -113,7 +113,8 @@ export function AppExt(): React.ReactElement {
         const clipText = await navigator.clipboard.readText()
         if(clipText){
           setCopiedText(clipText)        
-          removeSelectMessages()
+          clearDataAction()
+          chrome.runtime.sendMessage(clipText)
         }        
       }       
   }
@@ -182,6 +183,7 @@ export function AppExt(): React.ReactElement {
   const showSelectMessages = async() => {
     const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')    
     if(rowsChats && rowsChats.length>0){
+      clearOutput()
       setSelectMsgs(true)
       rowsChats.forEach((row) => {      
         row.querySelector('#crx-root-chkbx')?.remove() //remove duplicate items.
@@ -200,10 +202,10 @@ export function AppExt(): React.ReactElement {
     const rowsChats = document.querySelectorAll('#main [role="application"] [role="row"]')    
     if(rowsChats){
       setSelectMsgs(false)
-      setMessages([])
       rowsChats.forEach((row) => {      
         row.querySelector('#crx-root-chkbx')?.remove()              
-      });    
+      });
+
     }
   }
 
@@ -217,8 +219,13 @@ export function AppExt(): React.ReactElement {
 
   }
 
-  const cancelAction = () => {
+  const clearDataAction = () => {
+    setMessages([])
     removeSelectMessages();
+    clearOutput()
+  }
+
+  const clearOutput = () => {
     const output = document.querySelector('#output') ? document.querySelector('#output'):null
     if(output)
     output.innerHTML = "";
@@ -242,7 +249,7 @@ export function AppExt(): React.ReactElement {
       {errorMsg && (<span className="text-sm text-pretty text-red-500 tracking-wide">{errorMsg}</span>) }
 
       <ShowText id="output" >{copiedText}</ShowText>
-      <Button id="cancel" typeButton="danger" onClick={cancelAction} >Apagar mensagens</Button>       
+      <Button id="cancel" typeButton="danger" onClick={clearDataAction} >Apagar mensagens</Button>       
       </Container>
     </>
   )

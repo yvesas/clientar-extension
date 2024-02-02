@@ -19,20 +19,21 @@ export function ButtonClip({
   onClick,
   ...rest
 }: ButtonProps) {
+  console.log('<><>> CREATE  BUTTON clip > ')
   const typeActive = verifyColor()
 
   function verifyColor() {
     if (typeButton === 'new') {
-      return 'border rounded-lg bg-[#67C23A] hover:bg-gray-800 text-white-500 border-slate-400'
+      return 'clip-btn-n'
     } else if (typeButton === 'old') {
-      return 'border rounded-lg bg-[#67C23A] hover:bg-red-800 text-white-500 border-red-400'
+      return 'clip-btn-o'
     } else {
       return ''
     }
   }
 
   return (
-    <button id={id} {...rest} onClick={onClick}
+    <button id={id} {...rest} data-extapp="clipbtn" onClick={onClick}
     className={[typeActive,].join(' ')}  
     >
       {!loading ? (
