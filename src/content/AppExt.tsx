@@ -34,6 +34,15 @@ export function AppExt(): React.ReactElement {
          })
         setIsFirstRender(false)
       }
+      chrome.runtime.onMessage.addListener(function(message, sender) {
+        console.log('>>> CONTENT WPP recebeu! >>> sender:', sender)
+        if (message.action === "sendTextEXT") {
+          
+          const data = message.message
+          console.log('>>> CONTENT WPP recebeu! --> ', data)
+          
+        }
+      });
     }    
   }
   addEventClearAll()
@@ -114,7 +123,12 @@ export function AppExt(): React.ReactElement {
         if(clipText){
           setCopiedText(clipText)        
           clearDataAction()
-          chrome.runtime.sendMessage(clipText)
+          // console.log('>> GO Send Message >>')
+          // chrome.runtime.sendMessage({
+          //   action: "sendTextEXT",
+          //   message: clipText
+          // })
+          
         }        
       }       
   }
@@ -130,8 +144,7 @@ export function AppExt(): React.ReactElement {
         message: null
       }
       const selectorCopyableText = '[extapp="'+"ext-"+ id + '"] .copyable-text';
-      const copyableTextNodes = document.querySelectorAll(selectorCopyableText)    
-      // console.log('copyableTextNodes -> ', copyableTextNodes)
+      const copyableTextNodes = document.querySelectorAll(selectorCopyableText)          
 
       copyableTextNodes.forEach(async (node) => {  
         if(node.nodeName == 'DIV'){

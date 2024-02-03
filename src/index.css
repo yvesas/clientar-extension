@@ -24,8 +24,8 @@
   /* height: 50px; */
 }
 .clip-btn-n:hover {
-  box-shadow: 0 12px 16px 0 rgba(247, 193, 105,0.2), 0 17px 50px 0 rgba(247, 193, 105,0.19);
-  background-color: #ecb55d;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+  /* background-color: #ecb55d; */
   border: 1px solid #ecb55d;
 }
 

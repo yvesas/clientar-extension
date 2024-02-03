@@ -41,7 +41,7 @@ function insertPage() {
       setTimeout(function() {
         ReactDOM.createRoot(root).render(
           <React.StrictMode>
-            <AppExtCRM version="OLD"/> 
+            <AppExtCRM/> 
           </React.StrictMode>
         ); 
       }, 2500);   
@@ -55,14 +55,43 @@ function insertPage() {
       setTimeout(function() {
         ReactDOM.createRoot(root).render(
           <React.StrictMode>
-            <AppExtCRM version="NEW"/> 
+            <AppExtCRM/> 
           </React.StrictMode>
         ); 
       }, 2500);
      
     }
 
-  }  
+  }//
+
 }
 
 insertPage();
+
+
+// async function setupPage() {
+  // chrome.tabs.onActivated.addListener((activeInfo) => {
+  //   console.log('<>> TAB ACTIVATED -> ', activeInfo)
+  // });
+  
+//   const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
+//   console.log('TABs chrome', tab);
+//   if(tab){
+//     const tabID = tab.id ? tab.id : 0
+//     const response = await chrome.tabs.sendMessage(tabID, {greeting: "hello"});
+//     // do something with response here, not outside the function
+//     console.log('Send MSG tab content >>>', response);
+//   }
+
+//   chrome.runtime.onMessage.addListener(function(message, sender) {
+//     console.log('>>> CONTENT recebeu! >>> sender:', sender)
+//     if (message.action === "sendTextEXT") {
+      
+//       const data = message.message
+//       console.log('>>> CONTENT recebeu! --> ', data)
+      
+//     }
+//   });
+  
+// }
+// setupPage()

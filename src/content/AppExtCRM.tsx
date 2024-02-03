@@ -1,32 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, {useState, useEffect} from "react";
+import React, { useState} from "react";
 import ReactDOM from "react-dom/client";
 import { ButtonClip } from "../components/ButtonClip";
 
-interface AppProps {
-  version: string
-}
-
-export function AppExtCRM({ version }: AppProps): React.ReactElement {
+export function AppExtCRM(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
 
-  useEffect(() => {
-    console.log('BUTTON use effect > ', version, isFirstRender)
-    // verifyNewMessages()
-    // if(isFirstRender){
-    //   createContainerButtonClip()
-    // }    
-  }, [isFirstRender, version])
+  // useEffect(() => {
+  //     console.log('>> CALL useEffect')
+  // }, [isFirstRender])
 
   const validateClipTextIsWpp = (text:string) => {
-    // text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    //     [17:16, 28/01/2024] Maecenas sit amet pretium urna.
-    //     Fusce aliquam lacus eget neque ultricies, in ullamcorper magna ultricies.
-    //     [12:34, 01/02/2024] Cras eget nisi sed lectus pulvinar ullamcorper.
-    //     `;
       const regex = /\[(\d+):(\d+), (\d+)\/(\d+)\/(\d+)\]/g;
       const matches = text.match(regex);
-      console.log('find matches in clip text: ', matches)
       if(matches && matches.length>0){
         return true
       }else{
@@ -35,8 +21,7 @@ export function AppExtCRM({ version }: AppProps): React.ReactElement {
   }
   
   const removeClipButtons = () => {
-    const elements = document.querySelectorAll('#crx-root-btn')    
-    console.log('>>> Elements for remove -> ', elements)
+    const elements = document.querySelectorAll('#crx-root-btn')  
     if(elements){
       elements.forEach((ele) => {      
         ele?.remove()              
@@ -46,20 +31,16 @@ export function AppExtCRM({ version }: AppProps): React.ReactElement {
 
   const clipMessage = async () => {
     const clipText = await navigator.clipboard.readText();
-    console.log('CLIP msg -> ', clipText)
     if (clipText && validateClipTextIsWpp(clipText)) {            
       removeClipButtons()
     }
   };
  
   const createContainerButtonClip = () => {
-    const commentButtonContainer = document.querySelector("div.editor__button") as HTMLElement; // get new CRM
-    console.log('<><>> commentButtonContainer > ', commentButtonContainer)
+    const commentButtonContainer = document.querySelector("div.editor__button") as HTMLElement;    
 
-    if(commentButtonContainer){        
-      commentButtonContainer.querySelector('#crx-root-btn')?.remove() //remove duplicate items.
-      
-        setIsFirstRender(false)
+    if(commentButtonContainer){ 
+      commentButtonContainer.querySelector('#crx-root-btn')?.remove()   
         // const uniqueID = generateID();
         // commentButtonContainer.setAttribute("ext-container", "ext-"+uniqueID)
         const root = document.createElement("div");
@@ -71,8 +52,6 @@ export function AppExtCRM({ version }: AppProps): React.ReactElement {
         commentButtonContainer.style.setProperty("justify-content", "flex-start", 'important')
         commentButtonContainer.style.setProperty("gap", "15px 15px", "important");
         
-        console.log('<><>> CREATE Comp > ', root)
-
         ReactDOM.createRoot(root).render(
           <React.StrictMode>
             <ButtonClip id="clipAction" typeButton="new" onClick={clipMessage} >Colar</ButtonClip>       
@@ -80,15 +59,34 @@ export function AppExtCRM({ version }: AppProps): React.ReactElement {
         );
       }
     }
-    createContainerButtonClip()
+    
+    // const haveNewMessages = async () => {
+    //   try{
+    //     const clipText = await navigator.clipboard.readText();
+    //     if (clipText && validateClipTextIsWpp(clipText)) {      
+    //       return true
+    //     }else{
+    //       return false
+    //     }
+    //   }catch(err){
+    //     return false
+    //   }      
+    // }        
+
+    const showButtonClip =  async () => {
+      const commentButtonContainer = document.querySelector("div.editor__button") as HTMLElement;
+      if(commentButtonContainer){
+        const clipButton = commentButtonContainer.querySelector('#crx-root-btn')
+        if(clipButton){
+          return
+        // }else if(await haveNewMessages()){
+        }else {
+          createContainerButtonClip()
+        }        
+      }
+    }
   
-  // const verifyNewMessages = async () => {
-  //   const clipText = await navigator.clipboard.readText();
-  //   console.log('<><>> verifyNewMessages > ', clipText)
-  //   if (clipText && validateClipTextIsWpp(clipText)) {      
-  //     createContainerButtonClip()
-  //   }
-  // }
+  
 
   // const wantingMessages = () => {
   //   console.log('GO CREATE event mousemove')
@@ -100,10 +98,34 @@ export function AppExtCRM({ version }: AppProps): React.ReactElement {
     // chrome.runtime.onMessage.addListener()
   // }
   // wantingMessages()
+  
+  const observer = new MutationObserver(() => {    
+    showButtonClip()
+  });
+
+  const addListeners = () => {
+    if(isFirstRender){
+      setIsFirstRender(false)
+      // chrome.runtime.onMessage.addListener(function(message, sender) {
+      //   console.log('>>> CONTENT CRM recebeu! >>> sender:', sender)
+      //   if (message.action === "sendTextEXT") {
+          
+      //     const data = message.message
+      //     console.log('>>> CONTENT CRM recebeu! --> ', data)
+          
+      //   }
+      // });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  }
+  addListeners()
 
   return (
     <>
-    <div>{version}</div>
       {/* <Container>
       <div>{version}</div>
       <Button id="copyButton" onClick={clipMessage} >Colar as mensagens</Button>

@@ -19,7 +19,6 @@ export function ButtonClip({
   onClick,
   ...rest
 }: ButtonProps) {
-  console.log('<><>> CREATE  BUTTON clip > ')
   const typeActive = verifyColor()
 
   function verifyColor() {
