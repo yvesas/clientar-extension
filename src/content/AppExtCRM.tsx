@@ -20,9 +20,11 @@ export function AppExtCRM(): React.ReactElement {
       }
   }
   
-  const removeClipButtons = () => {
+  const removeClipButtons = async () => {
+    navigator.clipboard.writeText('a');
+    const clearClipText = await navigator.clipboard.readText()        
     const elements = document.querySelectorAll('#crx-root-btn')  
-    if(elements){
+    if(elements && clearClipText){
       elements.forEach((ele) => {      
         ele?.remove()              
       });    
@@ -31,7 +33,11 @@ export function AppExtCRM(): React.ReactElement {
 
   const clipMessage = async () => {
     const clipText = await navigator.clipboard.readText();
-    if (clipText && validateClipTextIsWpp(clipText)) {            
+    if (clipText && validateClipTextIsWpp(clipText)) {
+      
+      const textArea = document.querySelector("#quill-container div.ql-editor p") as HTMLElement;    
+      textArea.innerHTML = clipText
+
       removeClipButtons()
     }
   };
@@ -99,8 +105,16 @@ export function AppExtCRM(): React.ReactElement {
   // }
   // wantingMessages()
   
-  const observer = new MutationObserver(() => {    
-    showButtonClip()
+  const observer = new MutationObserver(() => {        
+    // for (const mutation of mutations) {
+    //   if (mutation.type === 'childList') {
+    //     for (const addedNode of mutation.addedNodes) {
+    //       if (addedNode.classList.contains('editor__button')) {
+                showButtonClip()
+    //       }
+    //     }
+    //   }
+    // }
   });
 
   const addListeners = () => {

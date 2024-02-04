@@ -34,15 +34,15 @@ export function AppExt(): React.ReactElement {
          })
         setIsFirstRender(false)
       }
-      chrome.runtime.onMessage.addListener(function(message, sender) {
-        console.log('>>> CONTENT WPP recebeu! >>> sender:', sender)
-        if (message.action === "sendTextEXT") {
+      // chrome.runtime.onMessage.addListener(function(message, sender) {
+      //   console.log('>>> CONTENT WPP recebeu! >>> sender:', sender)
+      //   if (message.action === "sendTextEXT") {
           
-          const data = message.message
-          console.log('>>> CONTENT WPP recebeu! --> ', data)
+      //     const data = message.message
+      //     console.log('>>> CONTENT WPP recebeu! --> ', data)
           
-        }
-      });
+      //   }
+      // });
     }    
   }
   addEventClearAll()
