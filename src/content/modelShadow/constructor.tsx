@@ -1,6 +1,8 @@
 import { AppExtension } from "./AppExtension";
 import { render } from "./render";
 
+
+
 function insertPage() {
   const appComponent = document.querySelector("#app") as HTMLElement; 
   if (appComponent) { 
@@ -9,5 +11,6 @@ function insertPage() {
     
     render(<AppExtension parentElement={appComponent} />);
   }
+
 }
 insertPage();

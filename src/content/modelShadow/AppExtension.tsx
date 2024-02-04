@@ -1,8 +1,8 @@
 import React, {useState} from "react";
-import { ShadowDom } from "../components/ShadowDom";
-import { Body } from "../components/Body";
-import { Button } from "../components/Button";
-import { ShowText } from "../components/ShowText";
+import { ShadowDom } from "../../components/ShadowDom";
+import { Container } from "../../components/Container";
+import { Button } from "../../components/Button";
+import { ShowText } from "../../components/ShowText";
 
 interface AppExtensionProps {
   parentElement: HTMLElement
@@ -31,10 +31,10 @@ export function AppExtension(props:AppExtensionProps): React.ReactElement | null
 
   return props.parentElement ? (
     <ShadowDom parentElement={props.parentElement} position="afterend" >
-      <Body>
+      <Container>
         <ShowText id="output" >{copiedText}</ShowText>
         <Button id="copyButton" onClick={copyAction} >Copiar as mensagens</Button>
-      </Body>
+      </Container>
     </ShadowDom>
   ) : null;
 }
