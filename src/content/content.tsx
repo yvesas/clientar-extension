@@ -44,7 +44,7 @@ function insertPage() {
             <AppExtCRM/> 
           </React.StrictMode>
         ); 
-      }, 2500);   
+      }, 2000);   
 
     }else if(crmComponentNew){
       const root = document.createElement("div");
@@ -58,7 +58,7 @@ function insertPage() {
             <AppExtCRM/> 
           </React.StrictMode>
         ); 
-      }, 2500);
+      }, 2000);
      
     }
 
