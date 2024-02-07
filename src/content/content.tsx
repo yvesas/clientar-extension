@@ -70,33 +70,26 @@ function insertPage() {
   } catch (err) {
     console.error("Failed insert page. ", err);
   }
+
 }
 
 insertPage();
 
-// async function setupPage() {
-// chrome.tabs.onActivated.addListener((activeInfo) => {
-//   console.log('<>> TAB ACTIVATED -> ', activeInfo)
-// });
-
-//   const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
-//   console.log('TABs chrome', tab);
-//   if(tab){
-//     const tabID = tab.id ? tab.id : 0
-//     const response = await chrome.tabs.sendMessage(tabID, {greeting: "hello"});
-//     // do something with response here, not outside the function
-//     console.log('Send MSG tab content >>>', response);
-//   }
-
-//   chrome.runtime.onMessage.addListener(function(message, sender) {
-//     console.log('>>> CONTENT recebeu! >>> sender:', sender)
-//     if (message.action === "sendTextEXT") {
-
-//       const data = message.message
-//       console.log('>>> CONTENT recebeu! --> ', data)
-
+// (async () => {
+//   const response = await chrome.runtime.sendMessage({action: "hello"});
+//   console.log('Ata: ', response);
+// })();s
+// chrome.runtime.onMessage.addListener(
+//   function(request, sender, sendResponse) {
+//     console.log('> CONTENT GERAL recebeu! - request:', request, sender)
+//     if (request.action==="hello"){
+//       sendResponse({farewell: "goodbye"});
 //     }
-//   });
-
-// }
-// setupPage()
+//     if (request.action==="sendTextEXT"){
+//       sendResponse({response: ">>> CONTENT GERAL recebeu 1"});
+//     }
+//     if (request.action==="sendTextEXTForAll"){
+//       sendResponse({response: "> CONTENT GERAL -> "+request.message});
+//     }
+//   }
+// );

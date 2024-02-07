@@ -36,15 +36,13 @@ export function AppExt(): React.ReactElement {
           });
           setIsFirstRender(false);
         }
-        // chrome.runtime.onMessage.addListener(function(message, sender) {
-        //   console.log('>>> CONTENT WPP recebeu! >>> sender:', sender)
-        //   if (message.action === "sendTextEXT") {
-
-        //     const data = message.message
-        //     console.log('>>> CONTENT WPP recebeu! --> ', data)
-
-        //   }
-        // });
+        chrome.storage.onChanged.addListener(
+          function(changes) {
+            if(changes && changes["clipboard-AppExt"] && !changes["clipboard-AppExt"].newValue){
+              clearDataAction();
+            }
+          }
+        );
       }
     } catch (err) {
       console.error("Failed add event Clear. ", err);
@@ -133,17 +131,9 @@ export function AppExt(): React.ReactElement {
             fullText = item.title + " " + item.message + "\n";
           }
         });
-        navigator.clipboard.writeText(fullText);
-        const clipText = await navigator.clipboard.readText();
-        if (clipText) {
-          setCopiedText(clipText);
-          clearDataAction();
-          // console.log('>> GO Send Message >>')
-          // chrome.runtime.sendMessage({
-          //   action: "sendTextEXT",
-          //   message: clipText
-          // })
-        }
+          setCopiedText(fullText);
+          clearDataAction();          
+          await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
       }
     } catch (err) {
       console.error("Failed copy action. ", err);

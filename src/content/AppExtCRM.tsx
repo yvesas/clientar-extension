@@ -5,12 +5,8 @@ import { ButtonClip } from "../components/ButtonClip";
 
 export function AppExtCRM(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
-
-  // useEffect(() => {
-  //     console.log('>> CALL useEffect')
-  // }, [isFirstRender])
-
-  const validateClipTextIsWpp = (text: string) => {
+  
+  const validateText = (text: string) => {
     try {
       const regex = /\[(\d+):(\d+), (\d+)\/(\d+)\/(\d+)\]/g;
       const matches = text.match(regex);
@@ -26,8 +22,9 @@ export function AppExtCRM(): React.ReactElement {
 
   const removeClipButtons = async () => {
     try {
-      navigator.clipboard.writeText("a");
+      // navigator.clipboard.writeText("a");
       // const clearClipText = await navigator.clipboard.readText()
+      await chrome.storage.local.set({ "clipboard-AppExt": null })
       const elements = document.querySelectorAll("#crx-root-btn");
       if (elements) {
         elements.forEach((ele) => {
@@ -41,15 +38,25 @@ export function AppExtCRM(): React.ReactElement {
 
   const clipMessage = async () => {
     try {
-      const clipText = await navigator.clipboard.readText();
-      if (clipText && validateClipTextIsWpp(clipText)) {
+      const result = await chrome.storage.local.get("clipboard-AppExt")
+      const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
+
+      if(clipMessages && clipMessages.length>0){
         const textArea = document.querySelector(
-          "#quill-container div.ql-editor p"
+          "#quill-container div.ql-editor"
         ) as HTMLElement;
-        textArea.innerHTML = clipText;
+
+        for (const item of clipMessages) {
+          if (item.message && !validateText(item.message)) {
+            const pText = document.createElement("p");
+            pText.id= item.id
+            pText.innerHTML = item.title + " " + item.message             
+            textArea.appendChild(pText)
+          }
+        }
 
         removeClipButtons();
-      }
+      }      
     } catch (err) {
       console.error("Failed clip message. ", err);
       return;
@@ -90,7 +97,7 @@ export function AppExtCRM(): React.ReactElement {
           "15px 15px",
           "important"
         );
-
+        
         ReactDOM.createRoot(root).render(
           <React.StrictMode>
             <ButtonClip id="clipAction" typeButton="new" onClick={clipMessage}>
@@ -105,18 +112,26 @@ export function AppExtCRM(): React.ReactElement {
     }
   };
 
-  // const haveNewMessages = async () => {
-  //   try{
-  //     const clipText = await navigator.clipboard.readText();
-  //     if (clipText && validateClipTextIsWpp(clipText)) {
-  //       return true
-  //     }else{
-  //       return false
-  //     }
-  //   }catch(err){
-  //     return false
-  //   }
-  // }
+  const haveNewMessages = async () => {
+    try{
+      // const clipText = await navigator.clipboard.readText();
+      // if (clipText && validateText(clipText)) {
+        const result = await chrome.storage.local.get("clipboard-AppExt")
+        const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
+          if(clipMessages && clipMessages.length>0){            
+            for (const item of clipMessages) {              
+              if (item.title && !validateText(item.title)) {
+                return false;
+              }
+            }  
+            return true;
+          }else{
+            return false
+          }      
+    }catch(err){
+      return false
+    }
+  }
 
   const showButtonClip = async () => {
     try {
@@ -128,8 +143,8 @@ export function AppExtCRM(): React.ReactElement {
           commentButtonContainer.querySelector("#crx-root-btn");
         if (clipButton) {
           return;
-          // }else if(await haveNewMessages()){
-        } else {
+        }else if(await haveNewMessages()){
+        // } else {
           createContainerButtonClip();
         }
       }
@@ -138,17 +153,6 @@ export function AppExtCRM(): React.ReactElement {
       return;
     }
   };
-
-  // const wantingMessages = () => {
-  //   console.log('GO CREATE event mousemove')
-  //   document.addEventListener("mousemove", () => {
-  //     console.log('CALL event mousemove')
-  //     verifyNewMessages()
-  //   });
-  // chrome.tabs.onActivated.addListener
-  // chrome.runtime.onMessage.addListener()
-  // }
-  // wantingMessages()
 
   const observer = new MutationObserver(() => {
     // for (const mutation of mutations) {
@@ -166,21 +170,19 @@ export function AppExtCRM(): React.ReactElement {
     try {
       if (isFirstRender) {
         setIsFirstRender(false);
-        // chrome.runtime.onMessage.addListener(function(message, sender) {
-        //   console.log('>>> CONTENT CRM recebeu! >>> sender:', sender)
-        //   if (message.action === "sendTextEXT") {
-
-        //     const data = message.message
-        //     console.log('>>> CONTENT CRM recebeu! --> ', data)
-
-        //   }
-        // });
-
         observer.observe(document.body, {
           childList: true,
           subtree: true,
         });
       }
+      chrome.storage.onChanged.addListener(
+        function(changes) {
+          if(changes && changes["clipboard-AppExt"]){
+            showButtonClip();
+          }
+        }
+      );
+      
     } catch (err) {
       console.error("Failed add listeners. ", err);
     }
