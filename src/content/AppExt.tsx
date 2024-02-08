@@ -11,6 +11,7 @@ import { sortMessages } from "../shared/sortMessages";
 
 export function AppExt(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isSelectAllMsgs, setIsSelectAllMsgs] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [selectMsgs, setSelectMsgs] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -262,6 +263,10 @@ export function AppExt(): React.ReactElement {
 
   const selectAllMessages = () => {
     try {
+      if(isSelectAllMsgs){
+          return;
+      }
+      
       const checkboxes = document.querySelectorAll(
         '#main [data-extapp="chckbx"]'
       );
@@ -269,6 +274,7 @@ export function AppExt(): React.ReactElement {
         checkboxes.forEach((box) => {
           (box as HTMLElement).click();
         });
+        setIsSelectAllMsgs(true)
       }
     } catch (err) {
       console.error("Failed select all messages. ", err);
@@ -276,6 +282,8 @@ export function AppExt(): React.ReactElement {
   };
 
   const clearDataAction = () => {
+    setIsSelectAllMsgs(false)
+    setCopiedText(null)
     setMessages([]);
     removeSelectMessages();
     clearOutput();
@@ -292,10 +300,12 @@ export function AppExt(): React.ReactElement {
     <>
       <Container>
         {selectMsgs ? (          
-          <div className="flex flex-col gap-y-4">
-            <Button id="selectAll" onClick={selectAllMessages}>
-              Selecionar mensagens recentes
-            </Button>
+          <div className="flex flex-col gap-y-4">            
+            {!isSelectAllMsgs && (
+              <Button id="selectAll" onClick={selectAllMessages}>
+                Selecionar mensagens recentes
+              </Button>
+            )}
 
             {messages && messages.length > 0 && (
               <Button id="copyButton" typeButton="secondary" onClick={copyAction}>
