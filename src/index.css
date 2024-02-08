@@ -25,8 +25,15 @@
 }
 .clip-btn-n:hover {
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
-  /* background-color: #ecb55d; */
-  border: 1px solid #ecb55d;
+  background-color: #f5bd62;
+  border: 1px solid #f5bd62;
+}
+.clip-btn-n img {
+  display: inline-block;
+  width: 20px; /* Adjust according to icon size */
+  height: 20px;
+  /* background-image: url("path/to/your/icon.svg"); Or set background-size */
+  margin-right: 5px; /* Adjust spacing */
 }
 
 .clip-btn-o {
@@ -44,6 +51,7 @@
   /* border-width: 3px; */
   background-color: #5d5dd6;
 }
+
 
 /* .checkbox {
   display: flex;

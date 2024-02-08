@@ -19,6 +19,7 @@ export function ButtonClip({
   onClick,
   ...rest
 }: ButtonProps) {
+  const imgWpp = chrome.runtime.getURL("wpp_icon.svg")
   const typeActive = verifyColor()
 
   function verifyColor() {
@@ -36,7 +37,10 @@ export function ButtonClip({
     className={[typeActive,].join(' ')}  
     >
       {!loading ? (
-        children
+        <>
+        <img src={imgWpp} />
+        <span>{children}</span>
+        </>
       ) : (
         <span>...</span>
       )}
