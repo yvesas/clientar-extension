@@ -7,6 +7,7 @@ import { AppExtCRM } from "./AppExtCRM";
 function insertPage() {
   try {
     if (window.location.hostname.includes("whatsapp")) {
+      setTimeout(function () {
       const appComponent = document.querySelector("#app") as HTMLElement;
       if (appComponent) {
         appComponent.style.setProperty("max-width", "100%", "important");
@@ -19,13 +20,14 @@ function insertPage() {
         const root = document.createElement("div");
         root.id = "crx-root";
         appComponent.appendChild(root);
-
+        console.log('CREATE Ext WPP! <><><>>>')
         ReactDOM.createRoot(root).render(
           <React.StrictMode>
             <AppExt />
           </React.StrictMode>
         );
       }
+      }, 1500);
     }
 
     if (window.location.hostname.includes("clientarcrm")) {
@@ -66,7 +68,7 @@ function insertPage() {
           );
         }, 1500);
       }
-    } //if crm
+    }
   } catch (err) {
     console.error("Failed insert page. ", err);
   }
