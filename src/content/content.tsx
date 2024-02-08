@@ -12,7 +12,7 @@ function insertPage() {
         appComponent.style.setProperty("max-width", "100%", "important");
         appComponent.style.setProperty(
           "width",
-          "calc(100% - 320px)",
+          "calc(100% - 300px)",
           "important"
         );
 

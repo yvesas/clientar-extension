@@ -132,7 +132,7 @@ export function AppExt(): React.ReactElement {
           }
         });
           setCopiedText(fullText);
-          clearDataAction();          
+          // clearDataAction();          
           await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
       }
     } catch (err) {
@@ -291,7 +291,7 @@ export function AppExt(): React.ReactElement {
   return (
     <>
       <Container>
-        {selectMsgs ? (
+        {selectMsgs ? (          
           <div className="flex flex-col gap-y-4">
             <Button id="selectAll" onClick={selectAllMessages}>
               Selecionar mensagens recentes
@@ -308,16 +308,21 @@ export function AppExt(): React.ReactElement {
             Selecionar mensagens
           </Button>
         )}
+
+        {messages && messages.length>0 && (
+            <>
+            <ShowText id="output">{copiedText}</ShowText>
+            <Button id="cancel" typeButton="danger" onClick={clearDataAction}>
+              Apagar mensagens
+            </Button>
+            </>
+        )}
+
         {errorMsg && (
           <span className="text-sm text-pretty text-red-500 tracking-wide">
             {errorMsg}
           </span>
-        )}
-
-        <ShowText id="output">{copiedText}</ShowText>
-        <Button id="cancel" typeButton="danger" onClick={clearDataAction}>
-          Apagar mensagens
-        </Button>
+        )}        
       </Container>
     </>
   );
