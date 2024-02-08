@@ -298,7 +298,7 @@ export function AppExt(): React.ReactElement {
             </Button>
 
             {messages && messages.length > 0 && (
-              <Button id="copyButton" onClick={copyAction}>
+              <Button id="copyButton" typeButton="secondary" onClick={copyAction}>
                 Copiar as mensagens
               </Button>
             )}
