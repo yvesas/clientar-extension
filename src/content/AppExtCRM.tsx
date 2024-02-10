@@ -267,9 +267,12 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           ButtonContainer.querySelector("#crx-root-btn");
         if (clipButton) {
           return;
-        }else if(await haveNewMessages()){
-        // } else {
-          createButtonContainer();
+        }else {         
+          if(await haveNewMessages()){
+            createButtonContainer();  
+          } else {
+            removeClipButtons();            
+          } 
         }
       }
     } catch (err) {
