@@ -20,7 +20,6 @@ function insertPage() {
         const root = document.createElement("div");
         root.id = "crx-root";
         appComponent.appendChild(root);
-        console.log('CREATE Ext WPP! <><><>>>')
         ReactDOM.createRoot(root).render(
           <React.StrictMode>
             <AppExt />
@@ -39,8 +38,7 @@ function insertPage() {
       ) as HTMLElement;
       const crmComponentOld = document.querySelector(
         "body.main"
-      ) as HTMLElement;
-      // console.log('>> ACHOU clientar crm OLD --> ', crmComponentOld)
+      ) as HTMLElement;      
 
       if (crmComponentOld) {
         const root = document.createElement("div");
@@ -50,10 +48,11 @@ function insertPage() {
         setTimeout(function () {
           ReactDOM.createRoot(root).render(
             <React.StrictMode>
-              <AppExtCRM />
+              <AppExtCRM newVersion={false} />
             </React.StrictMode>
           );
         }, 1500);
+
       } else if (crmComponentNew) {
         const root = document.createElement("div");
         root.id = "crx-root";
@@ -63,7 +62,7 @@ function insertPage() {
         setTimeout(function () {
           ReactDOM.createRoot(root).render(
             <React.StrictMode>
-              <AppExtCRM />
+              <AppExtCRM newVersion={true}/>
             </React.StrictMode>
           );
         }, 1500);
