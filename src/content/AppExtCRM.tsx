@@ -263,16 +263,16 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       const ButtonContainer = getParentContainerButtonClip(newVersion)
       
       if (ButtonContainer) {
-        const clipButton =
+        if(await haveNewMessages()){
+          const clipButton =
           ButtonContainer.querySelector("#crx-root-btn");
-        if (clipButton) {
-          return;
-        }else {         
-          if(await haveNewMessages()){
+          if (clipButton) {
+            return;
+          }else {                  
             createButtonContainer();  
-          } else {
-            removeClipButtons();            
-          } 
+          }  
+        } else {
+          removeClipButtons();            
         }
       }
     } catch (err) {
