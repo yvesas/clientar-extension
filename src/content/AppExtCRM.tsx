@@ -137,8 +137,9 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         "div.editor__button") as HTMLElement;
     }else{
       ButtonContainer = document.querySelector(
-        // "body.main textarea"
-        "#ped_comentario") as HTMLElement;
+        "body.main textarea"
+        // "#ped_comentario"
+        ) as HTMLElement;
 
       ButtonContainer = ButtonContainer?.parentElement ? ButtonContainer.parentElement : null
     }

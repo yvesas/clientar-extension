@@ -281,12 +281,13 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const clearDataAction = () => {
+  const clearDataAction = async () => {
     setIsSelectAllMsgs(false)
     setCopiedText(null)
     setMessages([]);
     removeSelectMessages();
     clearOutput();
+    await chrome.storage.local.set({ "clipboard-AppExt": null })
   };
 
   const clearOutput = () => {
