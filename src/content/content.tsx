@@ -26,7 +26,7 @@ function insertPage() {
           </React.StrictMode>
         );
       }
-      }, 1500);
+      }, 1000);
     }
 
     if (window.location.hostname.includes("clientarcrm")) {
@@ -51,7 +51,7 @@ function insertPage() {
               <AppExtCRM newVersion={false} />
             </React.StrictMode>
           );
-        }, 1500);
+        }, 500);
 
       } else if (crmComponentNew) {
         const root = document.createElement("div");
