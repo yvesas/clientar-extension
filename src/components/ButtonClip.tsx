@@ -7,7 +7,7 @@ export interface ButtonProps {
   typeButton?: 'new' | 'old'
   children: ReactNode
   loading?: boolean
-  onClick?: (e:any) => void;
+  onClick?: (e:any, id:string) => void;
   rest?: ButtonHTMLAttributes<HTMLButtonElement>
 }
 
@@ -16,7 +16,7 @@ export function ButtonClip({
   typeButton = 'new',
   children,
   loading = false,
-  onClick,
+  onClick = () => {},
   ...rest
 }: ButtonProps) {
   const imgWpp = chrome.runtime.getURL("wpp_icon.svg")
@@ -33,7 +33,7 @@ export function ButtonClip({
   }
 
   return (
-    <button id={id} {...rest} data-extapp="clipbtn" onClick={onClick}
+    <button id={id} {...rest} data-extapp="clipbtn" onClick={(e)=>onClick(e, id)}
     className={[typeActive,].join(' ')}  
     >
       {!loading ? (

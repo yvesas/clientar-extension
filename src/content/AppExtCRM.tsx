@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { ButtonClip } from "../components/ButtonClip";
+import { generateID } from "../shared/generateID";
+// import { generateID } from "../shared/generateID";
 
 export interface AppExtCrmProps {
   newVersion: boolean
@@ -66,7 +68,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   };
 
-  const clipMessageForOldVersion = async () => {
+  const clipMessageForOldVersion = async (uniqueID:string) => {
     try {
       const result = await chrome.storage.local.get("clipboard-AppExt")
       const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
@@ -74,9 +76,10 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       if(clipMessages && clipMessages.length>0){
         
         const textArea = document.querySelector(
-          "#crx-root-container textarea"
+          // "#crx-root-container textarea"
+          '[extapp="' + "cont-" + uniqueID + '"]'
         ) as HTMLElement;
-
+                
         let fullText = "";
         clipMessages.forEach((item: any, index: any) => {
           if (item.title && validateText(item.title)) {
@@ -95,9 +98,11 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   };
 
-  const clipMessage = async (e:any) => {
+  const clipMessage = async (e:any, id:string) => {
     try {
       e.preventDefault();
+      const uniqueId = id ? id : e.target.id;
+
       const result = await chrome.storage.local.get("clipboard-AppExt")
       const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
 
@@ -106,7 +111,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         if(newVersion){
           clipMessageForNewVersion()
         }else{
-          clipMessageForOldVersion()
+          clipMessageForOldVersion(uniqueId)
         }
 
         removeClipButtons();
@@ -117,12 +122,14 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   };
 
-  const renderComponent = (element:HTMLElement | null) => {    
+  const renderComponent = (element:HTMLElement | null, id:string|null) => {    
     if(element){
       const typeButton = newVersion ? "new" : "old"
+      const buttonID = id ? id : "clipAction"
+
       ReactDOM.createRoot(element).render(
           <React.StrictMode>
-            <ButtonClip id="clipAction" typeButton={typeButton} onClick={clipMessage}>
+            <ButtonClip id={buttonID} typeButton={typeButton} onClick={clipMessage}>
               Colar
             </ButtonClip>
           </React.StrictMode>
@@ -130,32 +137,32 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   }
 
-  const getParentContainerButtonClip = (isNewVersion:boolean) => {
+  const getParentContainerButtonClipNew = () => {
     let ButtonContainer = null
-    if(isNewVersion){
       ButtonContainer = document.querySelector(
-        "div.editor__button") as HTMLElement;
-    }else{
-      ButtonContainer = document.querySelector(
+        "div.editor__button") as HTMLElement;    
+    return ButtonContainer
+  }
+  const getParentContainerButtonClipOld = () => {
+    const ButtonContainerList = document.querySelectorAll(
         "body.main textarea"
         // "#ped_comentario"
-        ) as HTMLElement;
+        );
 
-      ButtonContainer = ButtonContainer?.parentElement ? ButtonContainer.parentElement : null
-    }
-    return ButtonContainer
+      // ButtonContainer = ButtonContainer?.parentElement ? ButtonContainer.parentElement : null
+    
+    return ButtonContainerList
   }
 
   const createButtonContainer = () => {
-    try {
-      const hookContainerElement = getParentContainerButtonClip(newVersion)
-      if (hookContainerElement) {                             
+    try {        
         if(newVersion){
+          const hookContainerElement = getParentContainerButtonClipNew()    
           createContainerForNewVersion(hookContainerElement)          
         }else{
-          createContainerForOldVersion(hookContainerElement)          
-        }        
-      }
+          const hookContainerElements = getParentContainerButtonClipOld()
+          createContainerForOldVersion(hookContainerElements)          
+        }              
     } catch (err) {
       console.error("Failed create clip button container. ", err);
       return;
@@ -189,7 +196,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
             "important"
           );
                 
-        renderComponent(root)
+        renderComponent(root, null)
       
     } catch (err) {
       console.error("Failed create container for new version. ", err);
@@ -197,19 +204,27 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   }
 
-  const createContainerForOldVersion = (hookElement:HTMLElement) => {
-    try{            
-          // const parentElement = hookElement.parentElement ? hookElement.parentElement : null
-          const parentElement = hookElement
+  const createContainerForOldVersion = (hookElements:NodeListOf<Element>) => {
+    try{                      
+          hookElements.forEach((textarea) => {
+          const parentElement = textarea.parentElement ? textarea.parentElement : null          
           if(parentElement){ 
+            const uniqueID = generateID(); 
+            // const data_id = '[extapp="' + "cont-" + uniqueID + '"]'
+            textarea.setAttribute("extapp", "cont-" + uniqueID);
+
             let innerHTML = parentElement.innerHTML
-            innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea")
+            innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea ")
+            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea "+data_id)
+            
             innerHTML = innerHTML.replace("</textarea>","</textarea></div>")
             parentElement.innerHTML = innerHTML
             
             const rootContainer = parentElement.querySelector("#crx-root-container") ? parentElement.querySelector("#crx-root-container") as HTMLElement : null            
             const root = document.createElement("div");
             root.id = "crx-root-btn";
+            root.setAttribute("extapp", "ext-" + uniqueID);
+            
             rootContainer?.appendChild(root);
             rootContainer?.style.setProperty(
               "display",
@@ -231,8 +246,11 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
               "15px 15px",
               "important"
             );
-            renderComponent(root as HTMLElement)
+            
+            renderComponent(root as HTMLElement, uniqueID)
           }
+
+        })
     } catch (err) {
       console.error("Failed create container for old version. ", err);
       return;
@@ -260,19 +278,35 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
 
   const showButtonClip = async () => {
     try {
-      const ButtonContainer = getParentContainerButtonClip(newVersion)
-      
-      if (ButtonContainer) {
-        if(await haveNewMessages()){
-          const clipButton =
-          ButtonContainer.querySelector("#crx-root-btn");
-          if (clipButton) {
-            return;
-          }else {                  
-            createButtonContainer();  
-          }  
-        } else {
-          removeClipButtons();            
+      if(newVersion){      
+        const ButtonContainer = getParentContainerButtonClipNew()      
+        if (ButtonContainer) {
+          if(await haveNewMessages()){
+            const clipButton =
+            ButtonContainer.querySelector("#crx-root-btn");
+            if (clipButton) {
+              return;
+            }else {               
+              createButtonContainer();  
+            }  
+          } else {
+            removeClipButtons();            
+          }
+        }
+      }else{
+        const ButtonContainer = getParentContainerButtonClipOld()      
+        if (ButtonContainer) {
+          if(await haveNewMessages()){
+            const clipButton =
+            document.querySelector("#crx-root-btn");
+            if (clipButton) {
+              return;
+            }else {               
+              createButtonContainer();  
+            }  
+          } else {
+            removeClipButtons();            
+          }
         }
       }
     } catch (err) {
@@ -285,7 +319,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     // for (const mutation of mutations) {
     //   if (mutation.type === 'childList') {
     //     for (const addedNode of mutation.addedNodes) {
-    //       if (addedNode.classList.contains('editor__button')) {
+    //       if (addedNode.classList.contains('editor__button')) {    
     showButtonClip();
     //       }
     //     }
@@ -300,6 +334,11 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         observer.observe(document.body, {
           childList: true,
           subtree: true,
+        });
+
+        const bodyContainer = document.querySelector("body.main");
+        bodyContainer?.addEventListener("mouseover", ()=>{          
+          showButtonClip();
         });
       }
       chrome.storage.onChanged.addListener(
