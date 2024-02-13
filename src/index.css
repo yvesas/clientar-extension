@@ -15,15 +15,14 @@
   background-color: #F5A523;
   border: 1px solid #F5A523;
   border-radius: 20px;
-  color: white;
-  padding: 5px;
+  color: white;  
   text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: 600;
   font-size: 12px;
-  width: 90px;
+  padding: 7px 25px 6px 25px;
 }
 .clip-btn-n:hover {
   cursor: pointer;
@@ -33,9 +32,9 @@
 }
 .clip-btn-n img {
   display: inline-block;
-  width: 20px; 
-  height: 20px; 
-  margin-right: 5px;
+  width: 16px; 
+  height: 16px; 
+  margin-right: 8px;
 }
 
 .clip-btn-o {
