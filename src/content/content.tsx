@@ -51,7 +51,7 @@ function insertPage() {
               <AppExtCRM newVersion={false} />
             </React.StrictMode>
           );
-        }, 500);
+        }, 1000);
 
       } else if (crmComponentNew) {
         const root = document.createElement("div");
