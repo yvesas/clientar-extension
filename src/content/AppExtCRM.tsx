@@ -233,8 +233,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
             rootContainer.appendChild(textarea) 
 
             // let innerHTML = parentNode.innerHTML
-            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea ")
-            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea "+data_id)            
+            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea ")          
             // innerHTML = innerHTML.replace("</textarea>","</textarea></div>")
             // parentNode.innerHTML = innerHTML            
             // const rootContainer = parentNode.querySelector("#crx-root-container") ? parentNode.querySelector("#crx-root-container") as HTMLElement : null 
