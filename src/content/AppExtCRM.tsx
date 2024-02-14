@@ -28,8 +28,6 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
 
   const removeClipButtons = async () => {
     try {
-      // navigator.clipboard.writeText("a");
-      // const clearClipText = await navigator.clipboard.readText()
       await chrome.storage.local.set({ "clipboard-AppExt": null })
       const elements = document.querySelectorAll("#crx-root-btn");
       if (elements) {
@@ -40,13 +38,13 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       if(!newVersion){
         const hookElements = document.querySelectorAll("#crx-root-container");
         hookElements.forEach((ele) => {
-          const parentNode = ele.parentNode ? ele.parentNode : null 
+          const parentNode = ele.parentElement ? ele.parentElement : null 
           const textarea = ele.querySelector("textarea") ? ele.querySelector("textarea") : null          
           if(ele && parentNode && textarea){           
             parentNode.insertBefore(textarea, ele);
             ele?.remove();
           }
-        })
+        })        
       }
     } catch (err) {
       console.error("Failed remove clip button. ", err);
@@ -58,7 +56,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       const result = await chrome.storage.local.get("clipboard-AppExt")
       const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
 
-      if(clipMessages && clipMessages.length>0){
+      if(clipMessages.length>0){
         
         const textArea = document.querySelector(
           "#quill-container div.ql-editor"
@@ -72,10 +70,12 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
             textArea.appendChild(pText)
           }
         }
-      }      
+        return true; 
+      }
+      return true;       
     } catch (err) {
       console.error("Failed clip message for new version. ", err);
-      return;
+      return false;
     }
   };
 
@@ -83,9 +83,8 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     try {
       const result = await chrome.storage.local.get("clipboard-AppExt")
       const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
-
-      if(clipMessages && clipMessages.length>0){
-        
+      
+      if(clipMessages.length>0){
         const textArea = document.querySelector(
           // "#crx-root-container textarea"
           '[extapp="' + "cont-" + uniqueID + '"]'
@@ -101,11 +100,15 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
             }
           }
         });
-        textArea.innerHTML = fullText
-      }      
+        
+        textArea.innerHTML = fullText;
+        console.log('--> what have? ', textArea, fullText)
+        return true; 
+      }
+      return true;     
     } catch (err) {
-      console.error("Failed clip message for new version. ", err);
-      return;
+      console.error("Failed clip message for old version. ", err);
+      return false;
     }
   };
 
@@ -118,14 +121,18 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
 
       if(clipMessages && clipMessages.length>0){
-        
+        let finishProcess = false
         if(newVersion){
-          clipMessageForNewVersion()
-        }else{
-          clipMessageForOldVersion(uniqueId)
-        }
-
-        removeClipButtons();
+          finishProcess = await clipMessageForNewVersion()
+          if(finishProcess){          
+            removeClipButtons();
+          }  
+        }else{         
+          finishProcess = await clipMessageForOldVersion(uniqueId)
+          if(finishProcess){          
+            removeClipButtons();
+          }  
+        }              
       }      
     } catch (err) {
       console.error("Failed clip message. ", err);
@@ -159,9 +166,6 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         "body.main textarea"
         // "#ped_comentario"
         );
-
-      // ButtonContainer = ButtonContainer?.parentElement ? ButtonContainer.parentElement : null
-    
     return ButtonContainerList
   }
 
@@ -218,24 +222,26 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
   const createContainerForOldVersion = (hookElements:NodeListOf<Element>) => {
     try{                      
           hookElements.forEach((textarea) => {
-          const parentElement = textarea.parentElement ? textarea.parentElement : null          
-          if(parentElement){ 
-            const uniqueID = generateID(); 
-            // const data_id = '[extapp="' + "cont-" + uniqueID + '"]'
-            textarea.setAttribute("extapp", "cont-" + uniqueID);
+          const parentNode = textarea.parentElement ? textarea.parentElement : null          
+          if(parentNode){ 
+            const uniqueID = generateID();
+            textarea.setAttribute("extapp", "cont-" + uniqueID);            
 
-            let innerHTML = parentElement.innerHTML
-            innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea ")
-            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea "+data_id)
-            
-            innerHTML = innerHTML.replace("</textarea>","</textarea></div>")
-            parentElement.innerHTML = innerHTML
-            
-            const rootContainer = parentElement.querySelector("#crx-root-container") ? parentElement.querySelector("#crx-root-container") as HTMLElement : null            
+            const rootContainer = document.createElement("div");
+            rootContainer.id = "crx-root-container";
+            parentNode.insertBefore(rootContainer, textarea);              
+            rootContainer.appendChild(textarea) 
+
+            // let innerHTML = parentNode.innerHTML
+            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea ")
+            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea "+data_id)            
+            // innerHTML = innerHTML.replace("</textarea>","</textarea></div>")
+            // parentNode.innerHTML = innerHTML            
+            // const rootContainer = parentNode.querySelector("#crx-root-container") ? parentNode.querySelector("#crx-root-container") as HTMLElement : null 
+
             const root = document.createElement("div");
             root.id = "crx-root-btn";
-            root.setAttribute("extapp", "ext-" + uniqueID);
-            
+            root.setAttribute("extapp", "ext-" + uniqueID);            
             rootContainer?.appendChild(root);
             rootContainer?.style.setProperty(
               "display",
