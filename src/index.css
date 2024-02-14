@@ -65,35 +65,6 @@
 }
 
 
-/* .checkbox {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-.checkbox input {
-  width: 20px;
-  height: 20px;
-}
-.checkbox-checked input {
-  background-color: #000 !important;
-  color: #fff !important;
-}
-.label {
-  margin-left: 10px;
-} */
-
- /* .checkboxContainer {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  border-radius: 20px;
-  border: 1px;
-}
-.checkboxContainer input:checked {
-  background-color: #2196F3;
-} */
-
-
 .container {
   display: block;
   position: relative;

@@ -37,6 +37,17 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           ele?.remove();
         });
       }
+      if(!newVersion){
+        const hookElements = document.querySelectorAll("#crx-root-container");
+        hookElements.forEach((ele) => {
+          const parentNode = ele.parentNode ? ele.parentNode : null 
+          const textarea = ele.querySelector("textarea") ? ele.querySelector("textarea") : null          
+          if(ele && parentNode && textarea){           
+            parentNode.insertBefore(textarea, ele);
+            ele?.remove();
+          }
+        })
+      }
     } catch (err) {
       console.error("Failed remove clip button. ", err);
     }
