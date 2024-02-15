@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { ButtonClip } from "../components/ButtonClip";
 import { generateID } from "../shared/generateID";
-// import { generateID } from "../shared/generateID";
 
 export interface AppExtCrmProps {
   newVersion: boolean
@@ -86,9 +85,8 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       
       if(clipMessages.length>0){
         const textArea = document.querySelector(
-          // "#crx-root-container textarea"
           '[extapp="' + "cont-" + uniqueID + '"]'
-        ) as HTMLElement;
+        ) as HTMLTextAreaElement;
                 
         let fullText = "";
         clipMessages.forEach((item: any, index: any) => {
@@ -101,8 +99,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           }
         });
         
-        textArea.innerHTML = fullText;
-        console.log('--> what have? ', textArea, fullText)
+        textArea.value = fullText;
         return true; 
       }
       return true;     
@@ -225,19 +222,13 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           const parentNode = textarea.parentElement ? textarea.parentElement : null          
           if(parentNode){ 
             const uniqueID = generateID();
-            textarea.setAttribute("extapp", "cont-" + uniqueID);            
+            textarea.setAttribute("extapp", "cont-" + uniqueID);  
 
             const rootContainer = document.createElement("div");
             rootContainer.id = "crx-root-container";
             parentNode.insertBefore(rootContainer, textarea);              
             rootContainer.appendChild(textarea) 
-
-            // let innerHTML = parentNode.innerHTML
-            // innerHTML = innerHTML.replace("<textarea","<div id='crx-root-container'><textarea ")          
-            // innerHTML = innerHTML.replace("</textarea>","</textarea></div>")
-            // parentNode.innerHTML = innerHTML            
-            // const rootContainer = parentNode.querySelector("#crx-root-container") ? parentNode.querySelector("#crx-root-container") as HTMLElement : null 
-
+             
             const root = document.createElement("div");
             root.id = "crx-root-btn";
             root.setAttribute("extapp", "ext-" + uniqueID);            
