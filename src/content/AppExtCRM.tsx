@@ -10,6 +10,17 @@ export interface AppExtCrmProps {
 
 export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
+
+  // const removeEmotions = (text:string) => {
+  //     let newText = "";
+  //     for (let i = 0; i < text.length; i++) {
+  //         const noEmotes = /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-\[\]\{\}_ªº°=<>+&%$@]/gi;          
+  //         if (text[i].match(noEmotes) == null) {
+  //           newText += text[i];
+  //         }
+  //     }
+  //     return newText
+  // }
   
   const validateText = (text: string) => {
     try {
@@ -91,6 +102,8 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         let fullText = "";
         clipMessages.forEach((item: any, index: any) => {
           if (item.title && validateText(item.title)) {
+            // const _message = removeEmotions(item.message)
+
             if (index > 0) {
               fullText += item.title + " " + item.message + "\n";
             } else {
