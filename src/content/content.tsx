@@ -132,13 +132,8 @@ async function startup() {
 
   if(openExt == null || openExt == true){
     console.log('>> Running in start up --')
-    // setTimeout(function () {
       insertAppExt();
-    // }, 200)
   }
-  // else{
-  //   removeAppExt()
-  // }
 
   chrome.storage.onChanged.addListener(
     function(changes) {
