@@ -105,8 +105,7 @@ function removeAppExt() {
         "body.main"
       ) as HTMLElement;      
 
-      if (crmComponentOld) { 
-        console.log('>> STEP crm > remove app component OLD')       
+      if (crmComponentOld) {     
         document.querySelector("#crx-root")?.remove();
 
         const hookElements = document.querySelectorAll("#crx-root-container");
@@ -119,8 +118,7 @@ function removeAppExt() {
           }
         }) 
 
-      } else if (crmComponentNew) {
-        console.log('>> STEP crm > remove app component NEW')            
+      } else if (crmComponentNew) {           
         document.querySelector("#crx-root")?.remove();        
       }
 
@@ -143,8 +141,6 @@ async function startup() {
   const result = await chrome.storage.local.get("AppExtOpen")
   const openExt = result ? result.AppExtOpen : null
 
-  console.log('>> value in start up: ', openExt, result, result.AppExtOpen)
-
   if(openExt == null || openExt == true){
     insertAppExt();
   }else{
@@ -154,8 +150,7 @@ async function startup() {
   chrome.storage.onChanged.addListener(
     function(changes) {
       if(changes && changes["AppExtOpen"]){
-        const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false
-        
+        const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false        
         if(openExt){          
           insertAppExt();
         }else{
