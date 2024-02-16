@@ -132,8 +132,7 @@ export function AppExt(): React.ReactElement {
             fullText = item.title + " " + item.message + "\n";
           }
         });
-          setCopiedText(fullText);
-          // clearDataAction();          
+          setCopiedText(fullText);      
           await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
       }
     } catch (err) {

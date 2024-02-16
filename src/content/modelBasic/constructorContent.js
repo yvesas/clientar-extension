@@ -1,14 +1,4 @@
 
-// console.log("VAI VER O QUE TEM! window ->", window);
-// window.addEventListener("load", function() {
-//   console.log("A página foi carregada! [load]");
-//   insertPage()
-// });
-// window.document.addEventListener("DOMContentLoaded", function() {
-//   console.log("O DOM foi carregado! [DOMContentLoaded]");
-//   insertPage()
-// });
-
 function createExtensionApp(){
     let extensionApp = document.createElement('div');
     extensionApp.style.setProperty("z-index", "100", 'important')
@@ -41,20 +31,20 @@ function createButtonCopy(){
   btnCopy.style.setProperty("background-color", "white", 'important')
 
   btnCopy.addEventListener('click', function () {
-    console.log('CLICK copy button!')
+    
     
     let copyText = document.querySelector('._11JPr.selectable-text.copyable-text')
     if(copyText && copyText.textContent){
       navigator.clipboard.writeText("COPY: "+copyText.textContent);
       navigator.clipboard.readText().then((clipText) => {
-        console.log('READ text -> ', clipText)
+        
         
         let ele = document.getElementById("output")
-        console.log('READ text o ELEmento -> ', ele)
+        
         
         ele.innerHTML = clipText;
       });
-      console.log('COPY ->>', copyText.textContent)
+      
     }  
   
     

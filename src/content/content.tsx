@@ -4,8 +4,14 @@ import "../index.css";
 import { AppExt } from "./AppExt";
 import { AppExtCRM } from "./AppExtCRM";
 
-function insertPage() {
+
+function insertAppExt() {
   try {
+    if(document.querySelector("#crx-root")){
+      return
+    }
+    chrome.storage.local.set({ "clipboard-AppExt": null })
+
     if (window.location.hostname.includes("whatsapp")) {
       setTimeout(function () {
       const appComponent = document.querySelector("#app") as HTMLElement;
@@ -26,13 +32,10 @@ function insertPage() {
           </React.StrictMode>
         );
       }
-      }, 500);
+      }, 300);
     }
 
     if (window.location.hostname.includes("clientarcrm")) {
-      // const crmComponentOld_specific = document.querySelectorAll("body.main textarea"); // get old CRM
-      // const crmComponentNew_specific = document.querySelectorAll("div.editor__button button span"); // get new CRM
-
       const crmComponentNew = document.querySelector(
         "#main-wrapper"
       ) as HTMLElement;
@@ -65,32 +68,103 @@ function insertPage() {
               <AppExtCRM newVersion={true}/>
             </React.StrictMode>
           );
-        }, 1000);
+        }, 500);
       }
     }
   } catch (err) {
-    console.error("Failed insert page. ", err);
+    console.error("Failed insert App Ext. ", err);
   }
-
 }
 
-insertPage();
+function removeAppExt() {
+  try {
+    if (window.location.hostname.includes("whatsapp")) {      
+      const appComponent = document.querySelector("#app") as HTMLElement;      
 
-// (async () => {
-//   const response = await chrome.runtime.sendMessage({action: "hello"});
-//   console.log('Ata: ', response);
-// })();s
-// chrome.runtime.onMessage.addListener(
-//   function(request, sender, sendResponse) {
-//     console.log('> CONTENT GERAL recebeu! - request:', request, sender)
-//     if (request.action==="hello"){
-//       sendResponse({farewell: "goodbye"});
-//     }
-//     if (request.action==="sendTextEXT"){
-//       sendResponse({response: ">>> CONTENT GERAL recebeu 1"});
-//     }
-//     if (request.action==="sendTextEXTForAll"){
-//       sendResponse({response: "> CONTENT GERAL -> "+request.message});
-//     }
-//   }
-// );
+      if (appComponent) {
+        document.querySelector("#crx-root")?.remove();
+        appComponent.style.removeProperty("max-width");
+        appComponent.style.removeProperty("width");
+
+        const rowsChats = document.querySelectorAll(
+          '#main [role="application"] [role="row"]'
+        );
+        if (rowsChats) {
+          rowsChats.forEach((row) => {
+            row.querySelector("#crx-root-chkbx")?.remove();
+          });
+        }
+      }
+    }
+
+    if (window.location.hostname.includes("clientarcrm")) {    
+      const crmComponentNew = document.querySelector(
+        "#main-wrapper"
+      ) as HTMLElement;
+      const crmComponentOld = document.querySelector(
+        "body.main"
+      ) as HTMLElement;      
+
+      if (crmComponentOld) { 
+        console.log('>> STEP crm > remove app component OLD')       
+        document.querySelector("#crx-root")?.remove();
+
+        const hookElements = document.querySelectorAll("#crx-root-container");
+        hookElements.forEach((ele) => {
+          const parentNode = ele.parentElement ? ele.parentElement : null 
+          const textarea = ele.querySelector("textarea") ? ele.querySelector("textarea") : null          
+          if(ele && parentNode && textarea){           
+            parentNode.insertBefore(textarea, ele);
+            ele?.remove();
+          }
+        }) 
+
+      } else if (crmComponentNew) {
+        console.log('>> STEP crm > remove app component NEW')            
+        document.querySelector("#crx-root")?.remove();        
+      }
+
+      const elements = document.querySelectorAll("#crx-root-btn");
+      if (elements) {
+        elements.forEach((ele) => {
+          ele?.remove();
+        });
+      }
+    }
+
+    chrome.storage.local.set({ "clipboard-AppExt": null })
+
+  } catch (err) {
+    console.error("Failed remove App Ext. ", err);
+  }
+}
+
+async function startup() {
+  const result = await chrome.storage.local.get("AppExtOpen")
+  const openExt = result ? result.AppExtOpen : null
+
+  console.log('>> value in start up: ', openExt, result, result.AppExtOpen)
+
+  if(openExt == null || openExt == true){
+    insertAppExt();
+  }else{
+    removeAppExt()
+  }
+
+  chrome.storage.onChanged.addListener(
+    function(changes) {
+      if(changes && changes["AppExtOpen"]){
+        const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false
+        
+        if(openExt){          
+          insertAppExt();
+        }else{
+          removeAppExt()
+        }
+      }
+    }
+  );
+}
+startup();
+
+

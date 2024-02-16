@@ -16,16 +16,14 @@ export function AppExtension(props:AppExtensionProps): React.ReactElement | null
       const copyText = document.querySelector('._11JPr.selectable-text.copyable-text')
       if(copyText && copyText.textContent){
         navigator.clipboard.writeText(copyText.textContent);
-        navigator.clipboard.readText().then((clipText) => {
-          console.log('READ text -> ', clipText)
+        navigator.clipboard.readText().then((clipText) => {          
           
-          // const ele = document.getElementById("output") as HTMLElement
-          // console.log('READ text o Elemento -> ', ele)
+          // const ele = document.getElementById("output") as HTMLElement          
           // ele.innerHTML = clipText;
 
           setCopiedText(clipText)
         });
-        console.log('COPY ->>', copyText.textContent)
+        
       }       
   }
 
