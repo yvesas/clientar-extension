@@ -131,7 +131,7 @@ async function startup() {
   const openExt = result ? result.AppExtOpen : null
 
   if(openExt == null || openExt == true){
-    console.log('>> Running start up - AppExtOpen value:', openExt)
+    console.log('>> Running startUp - Open value:', openExt)
       insertAppExt();
   }
 
@@ -139,7 +139,7 @@ async function startup() {
     function(changes) {
       if(changes && changes["AppExtOpen"]){
         
-        console.log('>> Running onChange AppExtOpen - new value:', changes["AppExtOpen"].newValue)
+        console.log('>> Running onChange - Open - new value:', changes["AppExtOpen"].newValue)
         
         const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false        
         if(openExt){          

@@ -14,15 +14,11 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
   const removeEmotions = (text:string) => {
       let newText = "";
       for (let i = 0; i < text.length; i++) {
-          const noEmotes = /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-[\]{}_ªº°=<>+&%$@]/gi;
-          // /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-\[\]\{\}_ªº°=<>+&%$@]/gi;          
-          
+          const noEmotes = /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-[\]{}_ªº°=<>+&%$@]/gi;                    
           if (text[i].match(noEmotes) == null) {
             newText += text[i];
           }
       }
-      console.log('>> old text: ', text)
-      console.log('>> new text: ', newText)
       return newText
   }
   
@@ -103,17 +99,11 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           '[extapp="' + "cont-" + uniqueID + '"]'
         ) as HTMLTextAreaElement;
 
-                
-        let fullText = textArea.value;
-        clipMessages.forEach((item: any, index: any) => {
+        let fullText = textArea.value? textArea.value+"\n" : "";
+        clipMessages.forEach((item: any) => {
           if (item.title && validateText(item.title)) {
             const _message = removeEmotions(item.message)
-
-            if (index > 0) {
-              fullText += item.title + " " + _message + "\n";
-            } else {
-              fullText = item.title + " " + _message + "\n";
-            }
+            fullText += item.title + " " + _message + "\n";
           }
         });
         
