@@ -10,8 +10,6 @@ function insertAppExt() {
     if(document.querySelector("#crx-root")){
       return
     }
-    chrome.storage.local.set({ "clipboard-AppExt": null })
-
     if (window.location.hostname.includes("whatsapp")) {      
       const appComponent = document.querySelector("#app") as HTMLElement;
       if (appComponent) {
@@ -133,15 +131,19 @@ async function startup() {
   const openExt = result ? result.AppExtOpen : null
 
   if(openExt == null || openExt == true){
+    console.log('>> Running in start up --')
     // setTimeout(function () {
       insertAppExt();
-    // }, 500)
-  }else{
-    removeAppExt()
+    // }, 200)
   }
+  // else{
+  //   removeAppExt()
+  // }
 
   chrome.storage.onChanged.addListener(
     function(changes) {
+      console.log('>> Running on Change --', changes)
+
       if(changes && changes["AppExtOpen"]){
         const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false        
         if(openExt){          
