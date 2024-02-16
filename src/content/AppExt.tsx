@@ -51,8 +51,9 @@ export function AppExt(): React.ReactElement {
   };
   addEventClearAll();
 
-  const addMessage = (messageObject: IMessageObject) => {
+  const addMessage = async (messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
+      messageObject.message = await extractStrongText(messageObject.message)
       setMessages((old) => [...old, messageObject]);
     }
   };
@@ -118,6 +119,21 @@ export function AppExt(): React.ReactElement {
         reject(error);
       }
     });
+  };
+
+  const extractStrongText = async (text: string | null): Promise<string | null> => {
+    if (!text) {
+      return null;
+    }
+  
+    const newText = text.replace(
+      /<strong([^>]*)>(.*?)<\/strong>/gi,
+      (_match, _attributes, innerText) => {
+        return innerText.trim();
+      }
+    );
+  
+    return newText;
   };
 
   const copyAction = async () => {

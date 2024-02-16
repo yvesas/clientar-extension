@@ -11,16 +11,20 @@ export interface AppExtCrmProps {
 export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
 
-  // const removeEmotions = (text:string) => {
-  //     let newText = "";
-  //     for (let i = 0; i < text.length; i++) {
-  //         const noEmotes = /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-\[\]\{\}_ªº°=<>+&%$@]/gi;          
-  //         if (text[i].match(noEmotes) == null) {
-  //           newText += text[i];
-  //         }
-  //     }
-  //     return newText
-  // }
+  const removeEmotions = (text:string) => {
+      let newText = "";
+      for (let i = 0; i < text.length; i++) {
+          const noEmotes = /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-[\]{}_ªº°=<>+&%$@]/gi;
+          // /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-\[\]\{\}_ªº°=<>+&%$@]/gi;          
+          
+          if (text[i].match(noEmotes) == null) {
+            newText += text[i];
+          }
+      }
+      console.log('>> old text: ', text)
+      console.log('>> new text: ', newText)
+      return newText
+  }
   
   const validateText = (text: string) => {
     try {
@@ -98,16 +102,17 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         const textArea = document.querySelector(
           '[extapp="' + "cont-" + uniqueID + '"]'
         ) as HTMLTextAreaElement;
+
                 
-        let fullText = "";
+        let fullText = textArea.value;
         clipMessages.forEach((item: any, index: any) => {
           if (item.title && validateText(item.title)) {
-            // const _message = removeEmotions(item.message)
+            const _message = removeEmotions(item.message)
 
             if (index > 0) {
-              fullText += item.title + " " + item.message + "\n";
+              fullText += item.title + " " + _message + "\n";
             } else {
-              fullText = item.title + " " + item.message + "\n";
+              fullText = item.title + " " + _message + "\n";
             }
           }
         });

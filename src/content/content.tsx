@@ -131,15 +131,16 @@ async function startup() {
   const openExt = result ? result.AppExtOpen : null
 
   if(openExt == null || openExt == true){
-    console.log('>> Running in start up --')
+    console.log('>> Running start up - AppExtOpen value:', openExt)
       insertAppExt();
   }
 
   chrome.storage.onChanged.addListener(
     function(changes) {
-      console.log('>> Running on Change --', changes)
-
       if(changes && changes["AppExtOpen"]){
+        
+        console.log('>> Running onChange AppExtOpen - new value:', changes["AppExtOpen"].newValue)
+        
         const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false        
         if(openExt){          
           insertAppExt();
