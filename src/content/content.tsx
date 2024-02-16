@@ -12,8 +12,7 @@ function insertAppExt() {
     }
     chrome.storage.local.set({ "clipboard-AppExt": null })
 
-    if (window.location.hostname.includes("whatsapp")) {
-      setTimeout(function () {
+    if (window.location.hostname.includes("whatsapp")) {      
       const appComponent = document.querySelector("#app") as HTMLElement;
       if (appComponent) {
         appComponent.style.setProperty("max-width", "100%", "important");
@@ -31,8 +30,7 @@ function insertAppExt() {
             <AppExt />
           </React.StrictMode>
         );
-      }
-      }, 300);
+      }      
     }
 
     if (window.location.hostname.includes("clientarcrm")) {
@@ -46,29 +44,22 @@ function insertAppExt() {
       if (crmComponentOld) {
         const root = document.createElement("div");
         root.id = "crx-root";
-        crmComponentOld.appendChild(root);
-
-        setTimeout(function () {
+        crmComponentOld.appendChild(root);        
           ReactDOM.createRoot(root).render(
             <React.StrictMode>
               <AppExtCRM newVersion={false} />
             </React.StrictMode>
           );
-        }, 100);
 
       } else if (crmComponentNew) {
         const root = document.createElement("div");
         root.id = "crx-root";
-        crmComponentNew.appendChild(root);
-        // crmComponentNew.style.setProperty("max-width", "100%", 'important')
-        // crmComponentNew.style.setProperty("width", "calc(100% - 320px)", 'important')
-        setTimeout(function () {
+        crmComponentNew.appendChild(root);        
           ReactDOM.createRoot(root).render(
             <React.StrictMode>
               <AppExtCRM newVersion={true}/>
             </React.StrictMode>
-          );
-        }, 500);
+          );        
       }
     }
   } catch (err) {
@@ -142,7 +133,9 @@ async function startup() {
   const openExt = result ? result.AppExtOpen : null
 
   if(openExt == null || openExt == true){
-    insertAppExt();
+    setTimeout(function () {
+      insertAppExt();
+    }, 500)
   }else{
     removeAppExt()
   }
