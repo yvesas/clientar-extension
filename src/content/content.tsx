@@ -133,9 +133,9 @@ async function startup() {
   const openExt = result ? result.AppExtOpen : null
 
   if(openExt == null || openExt == true){
-    setTimeout(function () {
+    // setTimeout(function () {
       insertAppExt();
-    }, 500)
+    // }, 500)
   }else{
     removeAppExt()
   }
