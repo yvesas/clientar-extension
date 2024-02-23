@@ -1,12 +1,12 @@
 
-let toggle = true
+// const toggle = true
 
-function setOpenExtension () {
-  toggle=!toggle
-  chrome.storage.local.set({"AppExtOpen": toggle })
-  return toggle
-}
+// function setOpenExtension () {
+//   toggle=!toggle
+//   chrome.storage.local.set({"AppExtOpen": toggle })
+//   return toggle
+// }
 
-chrome.action.onClicked.addListener(() => {
-  setOpenExtension() 
-});
+// chrome.action.onClicked.addListener(() => {
+//   setOpenExtension() 
+// });

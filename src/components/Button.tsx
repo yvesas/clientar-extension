@@ -23,11 +23,11 @@ export function Button({
 
   function verifyColor() {
     if (typeButton === 'primary') {
-      return 'bg-[#4d4ddb]  text-white'
+      return 'bg-[#4d4ddb]  text-white hover:bg-[#4d4ddbc5]'
     } else if (typeButton === 'secondary') {
-      return 'bg-[#f5a523] text-white'
+      return 'bg-[#f5a523] text-white hover:bg-[#f5a523b6]'
     } else if (typeButton === 'danger') {
-      return 'bg-[#DC143C] text-white'
+      return 'bg-[#DC143C] text-white hover:bg-[#dc143cc9]'
     } else {
       return ''
     }
