@@ -52,6 +52,7 @@ export function AppExt(): React.ReactElement {
   addEventClearAll();
 
   const addMessage = async (messageObject: IMessageObject) => {
+    console.log('>> insert new message object in array: ', messageObject)
     if (messageObject.id && messageObject.title && messageObject.message) {
       messageObject.message = await extractStrongText(messageObject.message)
       setMessages((old) => [...old, messageObject]);
@@ -156,16 +157,39 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const getText = async (id: string, checked: boolean) => {
+  const checkboxChangeHandler = async (id: string, checked: boolean) => {
     try {
       if (!checked) {
         removeMessage(id);
       } else {
+        const readMoreButtonSuper = document.querySelector(
+          '[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button'
+        );
+        if (readMoreButtonSuper) {
+          readMoreButtonSuper.addEventListener("click", () => {
+            setTimeout(() => {
+              console.log("Before time... 5");
+              getText(id);
+            }, 500);
+          });
+          (readMoreButtonSuper as HTMLElement).click();
+        } else {
+          getText(id);
+        }
+      }
+    } catch (err) {
+      console.error("Failed handler checkbox. ", err);
+    }
+  };
+
+  const getText = async (id: string) => {
+    try {
         const msgObj: IMessageObject = {
           id: id,
           title: null,
           message: null,
         };
+      
         const selectorCopyableText =
           '[extapp="' + "ext-" + id + '"] .copyable-text';
         const copyableTextNodes =
@@ -209,11 +233,95 @@ export function AppExt(): React.ReactElement {
           }
         });
         addMessage(msgObj);
-      }
+      
     } catch (err) {
       console.error("Failed get text. ", err);
     }
   };
+
+  // const fillMessage = async (parent: HTMLElement) => {
+  //   const node = parent.querySelector(".copyable-text span") as HTMLElement
+  //   console.log('>> whats NODE in fillMessage: ', node)
+  //   const elementText = node.firstChild as HTMLElement;
+  //           let _message = elementText.innerHTML ? elementText.innerHTML : null;
+
+  //           if (elementText.localName == "span") {
+  //             for (
+  //               let index = 0;
+  //               index < elementText.children.length;
+  //               index++
+  //             ) {
+  //               const child = elementText.children[index] as HTMLElement;
+  //               if (child.tagName == "IMG") {
+  //                 const altAttribute =
+  //                   child.attributes.getNamedItem("alt")?.value;
+  //                 _message = await replaceEmoticon(
+  //                   _message,
+  //                   altAttribute
+  //                 );
+  //               }
+  //               if (child.tagName == "A") {
+  //                 const hrefAttribute =
+  //                   child.attributes.getNamedItem("href")?.value;
+  //                 _message = await replaceLinkSource(
+  //                   _message,
+  //                   hrefAttribute
+  //                 );
+  //               }
+  //             }
+  //           }
+  //   return _message
+  // }
+
+  // const getText2 = async (id: string, checked: boolean) => {
+  //   try {
+  //     if (!checked) {
+  //       removeMessage(id);
+  //     } else {
+  //       const msgObj: IMessageObject = {
+  //         id: id,
+  //         title: null,
+  //         message: null,
+  //       };
+  //       const readMoreButtonSuper = document.querySelector('[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button')
+  //       if(readMoreButtonSuper){
+  //         (readMoreButtonSuper as HTMLElement).click()
+  //       }
+
+
+  //       const selectorCopyableText =
+  //         '[extapp="' + "ext-" + id + '"] .copyable-text';
+  //       const copyableTextNodes =
+  //         document.querySelectorAll(selectorCopyableText);
+
+  //       const divsWithText = Array.from(copyableTextNodes)
+  //       .filter((node) => node.nodeName === "DIV")
+  //       .filter((node) => node.attributes.getNamedItem("data-pre-plain-text")?.value);
+        
+  //       if (!divsWithText.length) return null;
+
+  //       const firstDiv = divsWithText[0];
+  //       msgObj.title = firstDiv.attributes.getNamedItem("data-pre-plain-text")?.value;
+
+  //       // const readMoreButton = firstDiv.querySelector('div .read-more-button')
+        
+  //       // if(readMoreButton){
+  //       //   readMoreButton.addEventListener("click", async () => {
+  //       //     console.log('>> reached the listener.')
+  //       //     msgObj.message = await fillMessage((firstDiv as HTMLElement))
+  //       //     addMessage(msgObj);
+  //       //   });
+  //       //   (readMoreButton as HTMLElement).click()
+  //       // }else{
+  //         msgObj.message = await fillMessage((firstDiv as HTMLElement))
+  //         addMessage(msgObj);
+  //       // }
+
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed get text. ", err);
+  //   }
+  // };
 
   const createContainerCheckBox = (parent: HTMLElement, uniqueID: string) => {
     try {
@@ -227,7 +335,7 @@ export function AppExt(): React.ReactElement {
 
       ReactDOM.createRoot(root).render(
         <React.StrictMode>
-          <CheckboxStyle id={uniqueID} checked={false} onChange={getText} />
+          <CheckboxStyle id={uniqueID} checked={false} onChange={checkboxChangeHandler} />
         </React.StrictMode>
       );
     } catch (err) {
