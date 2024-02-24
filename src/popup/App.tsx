@@ -1,22 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '../components/Button'
-// import extensionLogo from '../assets/icon_512.png'
-// import crmLogo from '../assets/clientar_logo.png'
-// import './App.css'
 
 function App() {
   const [openExtension, setOpenExtension] = useState(true)
-  const [labelOpenExtension, setLabelOpenExtension] = useState('Fechar')
+
+  useEffect(() => {    
+    startUpRoll();
+  }, []);
+
+  const startUpRoll = async () => {
+    const result = await chrome.storage.local.get("AppExtOpen")
+    const openExt = result ? result.AppExtOpen : null
+
+    if(openExt == null || openExt == true){
+      setOpenExtension(true)
+    }else{
+      setOpenExtension(false)     
+    }
+  }
 
   const handlerClickToggleExtension = () => {
     const toggle = !openExtension
-    setOpenExtension(toggle)
-    if(toggle){
-      setLabelOpenExtension('Fechar')
-    }else{
-      setLabelOpenExtension('Abrir')
-    }
-
+    setOpenExtension(toggle)    
     chrome.storage.local.set({"AppExtOpen": toggle })
   }
 
@@ -27,7 +32,9 @@ function App() {
   return (
     <div className="w-[120px] flex flex-col px-2 py-4 gap-2 bg-slate-50">
       {/* <span className='text-gray-800'>Clientar CRM - Extensão para o WhatsApp Web</span> */}
-      <Button id="toggleExtension" onClick={handlerClickToggleExtension}>{labelOpenExtension}</Button>
+      <Button id="toggleExtension" onClick={handlerClickToggleExtension}>
+      {openExtension ? "Fechar" : "Abrir"}
+      </Button>
       <Button id="toggleExtension" typeButton='danger' onClick={handlerRestartExtension}>Reiniciar</Button>
     </div>
   )
