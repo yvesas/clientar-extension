@@ -8,6 +8,7 @@ import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 import { IMessageObject } from "../shared/IMessageObject";
 import { sortMessages } from "../shared/sortMessages";
+import { extractStrongText, replaceEmoticon, replaceLinkSource } from "../shared/utils";
 
 export function AppExt(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
@@ -51,9 +52,9 @@ export function AppExt(): React.ReactElement {
   };
   addEventClearAll();
 
-  const addMessage = async (messageObject: IMessageObject) => {
+  const addMessage = (messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
-      messageObject.message = await extractStrongText(messageObject.message)
+      // messageObject.message = await extractStrongText(messageObject.message)
       setMessages((old) => [...old, messageObject]);
     }
   };
@@ -61,79 +62,6 @@ export function AppExt(): React.ReactElement {
     setMessages((prevMessages) =>
       prevMessages.filter((message) => message.id !== id)
     );
-  };
-
-  const replaceEmoticon = async (
-    text: string | null,
-    altValue: string | undefined
-  ): Promise<string | null> => {
-    if (!altValue) {
-      return text;
-    }
-    if (!text) {
-      return text;
-    }
-    return new Promise((resolve, reject) => {
-      try {
-        const newText = text.replace(
-          /<img[^>]*?alt="(.+?)"[^>]*?>/i,
-          (match, alt) => {
-            if (alt === altValue) {
-              return ` ${altValue} `;
-            } else {
-              return match;
-            }
-          }
-        );
-        resolve(newText);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
-  const replaceLinkSource = async (
-    text: string | null,
-    hrefValue: string | undefined
-  ): Promise<string | null> => {
-    if (!hrefValue) {
-      return text;
-    }
-    if (!text) {
-      return text;
-    }
-    return new Promise((resolve, reject) => {
-      try {
-        const newText = text.replace(
-          /<a[^>]*?\s*href="(.+?)"[^>]*?>\s*\n?\s*(?:.*?)<\/a>/i,
-          (match, href) => {
-            if (href.trim() === hrefValue.trim()) {
-              return ` ${hrefValue.trim()} `;
-            } else {
-              return match;
-            }
-          }
-        );
-        resolve(newText);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-
-  const extractStrongText = async (text: string | null): Promise<string | null> => {
-    if (!text) {
-      return null;
-    }
-  
-    const newText = text.replace(
-      /<strong([^>]*)>(.*?)<\/strong>/gi,
-      (_match, _attributes, innerText) => {
-        return innerText.trim();
-      }
-    );
-  
-    return newText;
   };
 
   const copyAction = async () => {
@@ -148,7 +76,7 @@ export function AppExt(): React.ReactElement {
             fullText = item.title + " " + item.message + "\n";
           }
         });
-          setCopiedText(fullText);      
+          setCopiedText(await extractStrongText(fullText) || fullText);      
           await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
       }
     } catch (err) {
@@ -193,6 +121,8 @@ export function AppExt(): React.ReactElement {
         const copyableTextNodes =
           document.querySelectorAll(selectorCopyableText);
 
+        console.log('>> Nodes copyable: ', copyableTextNodes)
+
         copyableTextNodes.forEach(async (node) => {
           if (node.nodeName == "DIV") {
             msgObj.title = node.attributes.getNamedItem(
@@ -201,7 +131,7 @@ export function AppExt(): React.ReactElement {
           }
           if (node.localName == "span") {
             const elementText = node.firstChild as HTMLElement;
-            msgObj.message = elementText.innerHTML;
+            msgObj.message = elementText.innerHTML;            
 
             if (elementText.localName == "span") {
               for (

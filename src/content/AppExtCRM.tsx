@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { ButtonClip } from "../components/ButtonClip";
 import { generateID } from "../shared/generateID";
+import { extractStrongText, removeEmotions, validateText } from "../shared/utils";
 
 export interface AppExtCrmProps {
   newVersion: boolean
@@ -10,31 +11,6 @@ export interface AppExtCrmProps {
 
 export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
-
-  const removeEmotions = (text:string) => {
-      let newText = "";
-      for (let i = 0; i < text.length; i++) {
-          const noEmotes = /[^\n0-9a-zA-Z'"' '.,áÁãÃâÂàÀéÉêÊíÍóÓõÕôÔúÚçÇ?!:;#()/*\-[\]{}_ªº°=<>+&%$@]/gi;                    
-          if (text[i].match(noEmotes) == null) {
-            newText += text[i];
-          }
-      }
-      return newText
-  }
-  
-  const validateText = (text: string) => {
-    try {
-      const regex = /\[(\d+):(\d+), (\d+)\/(\d+)\/(\d+)\]/g;
-      const matches = text.match(regex);
-      if (matches && matches.length > 0) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (err) {
-      console.error("Failed validate text. ", err);
-    }
-  };
 
   const removeClipButtons = async () => {
     try {
@@ -100,14 +76,15 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         ) as HTMLTextAreaElement;
 
         let fullText = textArea.value? textArea.value+"\n" : "";
-        clipMessages.forEach((item: any) => {
+        clipMessages.forEach(async (item: any) => {
           if (item.title && validateText(item.title)) {
-            const _message = removeEmotions(item.message)
+            const _message = removeEmotions(item.message);
             fullText += item.title + " " + _message + "\n";
           }
         });
         
-        textArea.value = fullText;
+        console.log('> fulltext final: ', fullText)
+        textArea.value = await extractStrongText(fullText) || fullText;
         return true; 
       }
       return true;     
