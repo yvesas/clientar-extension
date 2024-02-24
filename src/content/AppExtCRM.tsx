@@ -83,7 +83,6 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           }
         });
         
-        console.log('> fulltext final: ', fullText)
         textArea.value = await extractStrongText(fullText) || fullText;
         return true; 
       }
