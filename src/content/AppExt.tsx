@@ -108,64 +108,96 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const getText = async (id: string) => {
-    try {
-        const msgObj: IMessageObject = {
-          id: id,
-          title: null,
-          message: null,
-        };
+  const getText = async (id:string) => {
+    try{
+      const msgObj: IMessageObject = {
+        id: id,
+        title: null,
+        message: null,
+      };
+
+      const divTitle = document.querySelector('[extapp="' + "ext-" + id + '"] div .copyable-text')
+      msgObj.title = (divTitle as HTMLElement).attributes.getNamedItem(
+        "data-pre-plain-text"
+      )?.value;
+
+      const spanParentText = document.querySelector('[extapp="' + "ext-" + id + '"] .copyable-text div span')
+      const elementText = spanParentText?.firstChild as HTMLElement;                      
+      msgObj.message = (elementText as HTMLElement)?.innerHTML;
       
-        const selectorCopyableText =
-          '[extapp="' + "ext-" + id + '"] .copyable-text';
-        const copyableTextNodes =
-          document.querySelectorAll(selectorCopyableText);
-
-        console.log('>> Nodes copyable: ', copyableTextNodes)
-
-        copyableTextNodes.forEach(async (node) => {
-          if (node.nodeName == "DIV") {
-            msgObj.title = node.attributes.getNamedItem(
-              "data-pre-plain-text"
-            )?.value;
-          }
-          if (node.localName == "span") {
-            const elementText = node.firstChild as HTMLElement;
-            msgObj.message = elementText.innerHTML;            
-
-            if (elementText.localName == "span") {
-              for (
-                let index = 0;
-                index < elementText.children.length;
-                index++
-              ) {
-                const child = elementText.children[index] as HTMLElement;
-                if (child.tagName == "IMG") {
-                  const altAttribute =
-                    child.attributes.getNamedItem("alt")?.value;
-                  msgObj.message = await replaceEmoticon(
-                    msgObj.message,
-                    altAttribute
-                  );
-                }
-                if (child.tagName == "A") {
-                  const hrefAttribute =
-                    child.attributes.getNamedItem("href")?.value;
-                  msgObj.message = await replaceLinkSource(
-                    msgObj.message,
-                    hrefAttribute
-                  );
-                }
-              }
-            }
-          }
-        });
-        addMessage(msgObj);
-      
-    } catch (err) {
+      for (let index = 0; index < elementText.children.length; index++) {
+        const child = elementText.children[index] as HTMLElement;
+        if (child.tagName == "IMG") {
+          const altAttribute =
+            child.attributes.getNamedItem("alt")?.value;
+          msgObj.message = await replaceEmoticon(
+            msgObj.message,
+            altAttribute
+          );
+        }
+        if (child.tagName == "A") {
+          const hrefAttribute =
+            child.attributes.getNamedItem("href")?.value;
+          msgObj.message = await replaceLinkSource(
+            msgObj.message,
+            hrefAttribute
+          );
+        }
+      }
+      addMessage(msgObj);
+    }catch (err) {
       console.error("Failed get text. ", err);
     }
-  };
+  }
+
+  // const getText_V1 = async (id: string) => {
+  //   try {
+  //       const msgObj: IMessageObject = {
+  //         id: id,
+  //         title: null,
+  //         message: null,
+  //       };
+  //       const selectorCopyableText =
+  //         '[extapp="' + "ext-" + id + '"] .copyable-text';
+  //       const copyableTextNodes =
+  //         document.querySelectorAll(selectorCopyableText); 
+  //       copyableTextNodes.forEach(async (node) => {
+  //         if (node.nodeName == "DIV") {
+  //           msgObj.title = node.attributes.getNamedItem(
+  //             "data-pre-plain-text"
+  //           )?.value;
+  //         }
+  //         if (node.localName == "span") {
+  //           const elementText = node.firstChild as HTMLElement;
+  //           msgObj.message = elementText.innerHTML;            
+  //           if (elementText.localName == "span") {
+  //             for (let index = 0; index < elementText.children.length; index++) {
+  //               const child = elementText.children[index] as HTMLElement;
+  //               if (child.tagName == "IMG") {
+  //                 const altAttribute =
+  //                   child.attributes.getNamedItem("alt")?.value;
+  //                 msgObj.message = await replaceEmoticon(
+  //                   msgObj.message,
+  //                   altAttribute
+  //                 );
+  //               }
+  //               if (child.tagName == "A") {
+  //                 const hrefAttribute =
+  //                   child.attributes.getNamedItem("href")?.value;
+  //                 msgObj.message = await replaceLinkSource(
+  //                   msgObj.message,
+  //                   hrefAttribute
+  //                 );
+  //               }
+  //             }
+  //           }
+  //         }
+  //       });
+  //       addMessage(msgObj);
+  //   } catch (err) {
+  //     console.error("Failed get text. ", err);
+  //   }
+  // };
 
   const createContainerCheckBox = (parent: HTMLElement, uniqueID: string) => {
     try {
