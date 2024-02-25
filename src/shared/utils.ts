@@ -97,3 +97,24 @@ export const validateText = (text: string) => {
     console.error("Failed validate text. ", err);
   }
 };
+
+export const extractListItemText = async (text:string | null): Promise<string | null> => {  
+  if (!text) {
+    return text;
+  }
+
+  let liValues = text.replace(/<ul(.*?)>/g,"");
+  liValues = liValues.replace("</ul>","")
+  liValues = liValues.replace(/<li(.*?)>/g,"");
+  liValues = liValues.replace(/<\/li>/g,"")
+  liValues = liValues.replace(
+    /<span([^>]*)>(.*?)<\/span>/gi,
+    (_match, _attributes, innerText) => {
+      return innerText.trim();      
+    }
+  );
+  
+  return liValues;
+};
+
+

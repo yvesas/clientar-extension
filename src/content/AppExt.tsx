@@ -8,7 +8,7 @@ import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 import { IMessageObject } from "../shared/IMessageObject";
 import { sortMessages } from "../shared/sortMessages";
-import { extractStrongText, replaceEmoticon, replaceLinkSource } from "../shared/utils";
+import { extractListItemText, extractStrongText, replaceEmoticon, replaceLinkSource } from "../shared/utils";
 
 export function AppExt(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
@@ -54,7 +54,6 @@ export function AppExt(): React.ReactElement {
 
   const addMessage = (messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
-      // messageObject.message = await extractStrongText(messageObject.message)
       setMessages((old) => [...old, messageObject]);
     }
   };
@@ -142,6 +141,9 @@ export function AppExt(): React.ReactElement {
             msgObj.message,
             hrefAttribute
           );
+        }
+        if (child.tagName == "UL") {
+          msgObj.message = await extractListItemText(msgObj.message);
         }
       }
       addMessage(msgObj);
