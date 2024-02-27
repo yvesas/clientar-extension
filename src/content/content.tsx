@@ -65,92 +65,89 @@ function insertAppExt() {
   }
 }
 
-function removeAppExt() {
-  try {
-    if (window.location.hostname.includes("whatsapp")) {      
-      const appComponent = document.querySelector("#app") as HTMLElement;      
+// function removeAppExt() {
+//   try {
+//     if (window.location.hostname.includes("whatsapp")) {      
+//       const appComponent = document.querySelector("#app") as HTMLElement;      
 
-      if (appComponent) {
-        document.querySelector("#crx-root")?.remove();
-        appComponent.style.removeProperty("max-width");
-        appComponent.style.removeProperty("width");
+//       if (appComponent) {
+//         document.querySelector("#crx-root")?.remove();
+//         appComponent.style.removeProperty("max-width");
+//         appComponent.style.removeProperty("width");
 
-        const rowsChats = document.querySelectorAll(
-          '#main [role="application"] [role="row"]'
-        );
-        if (rowsChats) {
-          rowsChats.forEach((row) => {
-            row.querySelector("#crx-root-chkbx")?.remove();
-          });
-        }
-      }
-    }
+//         const rowsChats = document.querySelectorAll(
+//           '#main [role="application"] [role="row"]'
+//         );
+//         if (rowsChats) {
+//           rowsChats.forEach((row) => {
+//             row.querySelector("#crx-root-chkbx")?.remove();
+//           });
+//         }
+//       }
+//     }
 
-    if (window.location.hostname.includes("clientarcrm")) {    
-      const crmComponentNew = document.querySelector(
-        "#main-wrapper"
-      ) as HTMLElement;
-      const crmComponentOld = document.querySelector(
-        "body.main"
-      ) as HTMLElement;      
+//     if (window.location.hostname.includes("clientarcrm")) {    
+//       const crmComponentNew = document.querySelector(
+//         "#main-wrapper"
+//       ) as HTMLElement;
+//       const crmComponentOld = document.querySelector(
+//         "body.main"
+//       ) as HTMLElement;      
 
-      if (crmComponentOld) {     
-        document.querySelector("#crx-root")?.remove();
+//       if (crmComponentOld) {     
+//         document.querySelector("#crx-root")?.remove();
 
-        const hookElements = document.querySelectorAll("#crx-root-container");
-        hookElements.forEach((ele) => {
-          const parentNode = ele.parentElement ? ele.parentElement : null 
-          const textarea = ele.querySelector("textarea") ? ele.querySelector("textarea") : null          
-          if(ele && parentNode && textarea){           
-            parentNode.insertBefore(textarea, ele);
-            ele?.remove();
-          }
-        }) 
+//         const hookElements = document.querySelectorAll("#crx-root-container");
+//         hookElements.forEach((ele) => {
+//           const parentNode = ele.parentElement ? ele.parentElement : null 
+//           const textarea = ele.querySelector("textarea") ? ele.querySelector("textarea") : null          
+//           if(ele && parentNode && textarea){           
+//             parentNode.insertBefore(textarea, ele);
+//             ele?.remove();
+//           }
+//         }) 
 
-      } else if (crmComponentNew) {           
-        document.querySelector("#crx-root")?.remove();        
-      }
+//       } else if (crmComponentNew) {           
+//         document.querySelector("#crx-root")?.remove();        
+//       }
 
-      const elements = document.querySelectorAll("#crx-root-btn");
-      if (elements) {
-        elements.forEach((ele) => {
-          ele?.remove();
-        });
-      }
-    }
+//       const elements = document.querySelectorAll("#crx-root-btn");
+//       if (elements) {
+//         elements.forEach((ele) => {
+//           ele?.remove();
+//         });
+//       }
+//     }
 
-    chrome.storage.local.set({ "clipboard-AppExt": null })
+//     chrome.storage.local.set({ "clipboard-AppExt": null })
 
-  } catch (err) {
-    console.error("Failed remove App Ext. ", err);
-  }
-}
+//   } catch (err) {
+//     console.error("Failed remove App Ext. ", err);
+//   }
+// }
 
-async function startup() {
-  const result = await chrome.storage.local.get("AppExtOpen")
-  const openExt = result ? result.AppExtOpen : null
-
-  if(openExt == null || openExt == true){
-    // console.info('>> Running startUp - Open value:', openExt)
-      insertAppExt();
-  }
-
-  chrome.storage.onChanged.addListener(
-    function(changes) {
-      if(changes && changes["AppExtOpen"]){
-        
-        // console.info('>> Running onChange - Open - new value:', changes["AppExtOpen"].newValue)
-        
-        const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false        
-        if(openExt){          
-          insertAppExt();
-        }else{
-          removeAppExt()
-        }
-      }
-    }
-  );
-}
-startup();
+// async function startup() {
+//   const result = await chrome.storage.local.get("AppExtOpen")
+//   const openExt = result ? result.AppExtOpen : null
+//   if(openExt == null || openExt == true){
+//     // console.info('>> Running startUp - Open value:', openExt)
+//       insertAppExt();
+//   }
+//   chrome.storage.onChanged.addListener(
+//     function(changes) {
+//       if(changes && changes["AppExtOpen"]){        
+//         // console.info('>> Running onChange - Open - new value:', changes["AppExtOpen"].newValue)
+//         const openExt = changes["AppExtOpen"] ? changes["AppExtOpen"].newValue : false        
+//         if(openExt){          
+//           insertAppExt();
+//         }else{
+//           removeAppExt()
+//         }
+//       }
+//     }
+//   );
+// }
+// startup();
+insertAppExt();
 
 
