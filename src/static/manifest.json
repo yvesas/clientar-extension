@@ -7,8 +7,7 @@
   "permissions": ["storage","activeTab"],
   "action": {
     "default_title": "Clientar",     
-    "default_icon": "src/assets/icon_128x128.png",
-    "default_popup": "src/popup/index.html"
+    "default_icon": "src/assets/icon_128x128.png"    
    },
    "icons": {
     "16": "src/assets/icon_128x128.png",
