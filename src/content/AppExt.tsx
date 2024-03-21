@@ -83,24 +83,45 @@ export function AppExt(): React.ReactElement {
     }
   };
 
+  const verifyType = async (id:string) => {
+    const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] div ._3rsWd span')
+    const isTextType = document.querySelector('[extapp="' + "ext-" + id + '"] div .copyable-text')
+    const isImageType = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .cm280p3y .lhggkp7q img')
+
+    if(isAudioType){
+      return 'AUDIO'
+    }else if(isTextType){
+      return 'TEXT'
+    }else if(isImageType){
+      return 'SHARED_IMG'
+    }
+  }
+
   const checkboxChangeHandler = async (id: string, checked: boolean) => {
     try {
       if (!checked) {
         removeMessage(id);
       } else {
-        const readMoreButtonSuper = document.querySelector(
-          '[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button'
-        );
-        if (readMoreButtonSuper) {
-          readMoreButtonSuper.addEventListener("click", () => {
-            setTimeout(() => {
-              getText(id);
-            }, 500);
-          });
-          (readMoreButtonSuper as HTMLElement).click();
-        } else {
-          getText(id);
-        }
+        const _type = await verifyType(id)
+        if(_type === 'TEXT'){
+          const readMoreButtonSuper = document.querySelector(
+            '[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button'
+          );
+          if (readMoreButtonSuper) {
+            readMoreButtonSuper.addEventListener("click", () => {
+              setTimeout(() => {
+                getText(id);
+              }, 500);
+            });
+            (readMoreButtonSuper as HTMLElement).click();
+          } else {                    
+            getText(id);
+          }          
+        }else if(_type === 'AUDIO'){
+          getAudio(id)
+        }else if(_type === 'SHARED_IMG'){
+          getSharedImage(id)
+        }        
       }
     } catch (err) {
       console.error("Failed handler checkbox. ", err);
@@ -152,54 +173,36 @@ export function AppExt(): React.ReactElement {
     }
   }
 
-  // const getText_V1 = async (id: string) => {
-  //   try {
-  //       const msgObj: IMessageObject = {
-  //         id: id,
-  //         title: null,
-  //         message: null,
-  //       };
-  //       const selectorCopyableText =
-  //         '[extapp="' + "ext-" + id + '"] .copyable-text';
-  //       const copyableTextNodes =
-  //         document.querySelectorAll(selectorCopyableText); 
-  //       copyableTextNodes.forEach(async (node) => {
-  //         if (node.nodeName == "DIV") {
-  //           msgObj.title = node.attributes.getNamedItem(
-  //             "data-pre-plain-text"
-  //           )?.value;
-  //         }
-  //         if (node.localName == "span") {
-  //           const elementText = node.firstChild as HTMLElement;
-  //           msgObj.message = elementText.innerHTML;            
-  //           if (elementText.localName == "span") {
-  //             for (let index = 0; index < elementText.children.length; index++) {
-  //               const child = elementText.children[index] as HTMLElement;
-  //               if (child.tagName == "IMG") {
-  //                 const altAttribute =
-  //                   child.attributes.getNamedItem("alt")?.value;
-  //                 msgObj.message = await replaceEmoticon(
-  //                   msgObj.message,
-  //                   altAttribute
-  //                 );
-  //               }
-  //               if (child.tagName == "A") {
-  //                 const hrefAttribute =
-  //                   child.attributes.getNamedItem("href")?.value;
-  //                 msgObj.message = await replaceLinkSource(
-  //                   msgObj.message,
-  //                   hrefAttribute
-  //                 );
-  //               }
-  //             }
-  //           }
-  //         }
-  //       });
-  //       addMessage(msgObj);
-  //   } catch (err) {
-  //     console.error("Failed get text. ", err);
-  //   }
-  // };
+  const getAudio = async (id:string) => {
+    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .xmUYL')
+    const mouseoverEvent = new MouseEvent('mouseover', {
+      bubbles: true,
+      cancelable: true,
+    });
+    (divForHoverEvent as Element).addEventListener("onmouseover", () => {
+      setTimeout(() => {
+        const spanContext = document.querySelector('[extapp="' + "ext-" + id + '"] span ._1bGUW div') as HTMLElement
+        (spanContext as Element).addEventListener("click", () => {
+          setTimeout(() => {
+            const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
+            document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
+            (menuContext as HTMLElement).click();
+           }, 500);
+        });
+        (spanContext as HTMLElement).click();
+      }, 500);
+    });
+    (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
+  }
+
+  const getSharedImage = async (id:string) => {
+    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .cm280p3y')
+    const mouseoverEvent = new MouseEvent('mouseover', {
+      bubbles: true,
+      cancelable: true,
+    });
+    (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
+  }
 
   const createContainerCheckBox = (parent: HTMLElement, uniqueID: string) => {
     try {
@@ -320,14 +323,14 @@ export function AppExt(): React.ReactElement {
             Selecionar mensagens
           </Button>
         )}
-
-        {messages && messages.length>0 && (
-            <>
-            <ShowText id="output">{copiedText}</ShowText>
+        {copiedText && (            
+          <ShowText id="output">{copiedText}</ShowText>            
+        )}
+        {messages && messages.length>0 && (            
             <Button id="cancel" typeButton="danger" onClick={clearDataAction}>
               Apagar mensagens
             </Button>
-            </>
+            
         )}
 
         {errorMsg && (
