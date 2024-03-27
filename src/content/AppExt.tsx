@@ -47,13 +47,15 @@ export function AppExt(): React.ReactElement {
         );
       }
     } catch (err) {
-      console.error("Failed add event Clear. ", err);
+      console.log("Failed add event Clear. ", err);
     }
   };
   addEventClearAll();
 
   const addMessage = (messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
+      console.log("@> added new message with obtained text :: ", messageObject.id)
+      console.log("@> Message title: ", messageObject.title)
       setMessages((old) => [...old, messageObject]);
     }
   };
@@ -65,6 +67,7 @@ export function AppExt(): React.ReactElement {
 
   const copyAction = async () => {
     try {
+      console.log("@> starting process of copying")
       if (messages && messages.length > 0) {
         const messagesOrdered = await sortMessages(messages);
         let fullText = "";
@@ -77,20 +80,25 @@ export function AppExt(): React.ReactElement {
         });
           setCopiedText(await extractStrongText(fullText) || fullText);      
           await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
+      }else{
+        console.log("@> anything to copy. there are no message! ")
       }
     } catch (err) {
-      console.error("Failed copy action. ", err);
+      console.log("Failed copy action. ", err);
     }
   };
 
   const checkboxChangeHandler = async (id: string, checked: boolean) => {
     try {
+      console.log("@> click in CheckBox.")
       if (!checked) {
+        console.log("@> Unchecked.")
         removeMessage(id);
       } else {
+        console.log("@> CheckBox started to obtain the text.")
         const readMoreButtonSuper = document.querySelector(
           '[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button'
-        );
+        );        
         if (readMoreButtonSuper) {
           readMoreButtonSuper.addEventListener("click", () => {
             setTimeout(() => {
@@ -98,17 +106,18 @@ export function AppExt(): React.ReactElement {
             }, 500);
           });
           (readMoreButtonSuper as HTMLElement).click();
-        } else {
+        } else {          
           getText(id);
         }
       }
     } catch (err) {
-      console.error("Failed handler checkbox. ", err);
+      console.log("Failed handler checkbox. ", err);
     }
   };
 
   const getText = async (id:string) => {
     try{
+      console.log("@> starting the process of getting the text :: ", id)
       const msgObj: IMessageObject = {
         id: id,
         title: null,
@@ -148,7 +157,7 @@ export function AppExt(): React.ReactElement {
       }
       addMessage(msgObj);
     }catch (err) {
-      console.error("Failed get text. ", err);
+      console.log("Failed get text. ", err);
     }
   }
 
@@ -197,7 +206,7 @@ export function AppExt(): React.ReactElement {
   //       });
   //       addMessage(msgObj);
   //   } catch (err) {
-  //     console.error("Failed get text. ", err);
+  //     console.log("Failed get text. ", err);
   //   }
   // };
 
@@ -217,7 +226,7 @@ export function AppExt(): React.ReactElement {
         </React.StrictMode>
       );
     } catch (err) {
-      console.error("Failed create checkbox container. ", err);
+      console.log("Failed create checkbox container. ", err);
     }
   };
 
@@ -242,7 +251,7 @@ export function AppExt(): React.ReactElement {
         setErrorMsg("Entre em uma conversa para selecionar as mensagens.");
       }
     } catch (err) {
-      console.error("Failed show checkbox. ", err);
+      console.log("Failed show checkbox. ", err);
     }
   };
 
@@ -258,7 +267,7 @@ export function AppExt(): React.ReactElement {
         });
       }
     } catch (err) {
-      console.error("Failed remove checkbox. ", err);
+      console.log("Failed remove checkbox. ", err);
     }
   };
 
@@ -278,7 +287,7 @@ export function AppExt(): React.ReactElement {
         setIsSelectAllMsgs(true)
       }
     } catch (err) {
-      console.error("Failed select all messages. ", err);
+      console.log("Failed select all messages. ", err);
     }
   };
 

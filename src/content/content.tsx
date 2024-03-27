@@ -7,7 +7,9 @@ import { AppExtCRM } from "./AppExtCRM";
 
 function insertAppExt() {
   try {
+    console.log("Hello! - insert App Ext");
     if(document.querySelector("#crx-root")){
+      console.log("@> exist App Ext")
       return
     }
     if (window.location.hostname.includes("whatsapp")) {      
@@ -61,7 +63,7 @@ function insertAppExt() {
       }
     }
   } catch (err) {
-    console.error("Failed insert App Ext. ", err);
+    console.log("Failed insert App Ext. ", err);
   }
 }
 
