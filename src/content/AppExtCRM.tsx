@@ -44,9 +44,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
 
       if(clipMessages.length>0){
         
-        const textArea = document.querySelector(
-          "#quill-container div.ql-editor"
-        ) as HTMLElement;
+        const textArea = document.querySelector("div.ql-editor") as HTMLElement;
 
         for (const item of clipMessages) {
           if (item.title && validateText(item.title)) {

@@ -47,13 +47,15 @@ export function AppExt(): React.ReactElement {
         );
       }
     } catch (err) {
-      console.error("Failed add event Clear. ", err);
+      console.log("Failed add event Clear. ", err);
     }
   };
   addEventClearAll();
 
   const addMessage = (messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
+      console.log("@> added new message with obtained text :: ", messageObject.id)
+      console.log("@> Message title: ", messageObject.title)
       setMessages((old) => [...old, messageObject]);
     }
   };
@@ -65,6 +67,7 @@ export function AppExt(): React.ReactElement {
 
   const copyAction = async () => {
     try {
+      console.log("@> starting process of copying")
       if (messages && messages.length > 0) {
         const messagesOrdered = await sortMessages(messages);
         let fullText = "";
@@ -77,9 +80,11 @@ export function AppExt(): React.ReactElement {
         });
           setCopiedText(await extractStrongText(fullText) || fullText);      
           await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
+      }else{
+        console.log("@> anything to copy. there are no message! ")
       }
     } catch (err) {
-      console.error("Failed copy action. ", err);
+      console.log("Failed copy action. ", err);
     }
   };
 
@@ -99,9 +104,12 @@ export function AppExt(): React.ReactElement {
 
   const checkboxChangeHandler = async (id: string, checked: boolean) => {
     try {
+      console.log("@> click in CheckBox.")
       if (!checked) {
+        console.log("@> Unchecked.")
         removeMessage(id);
       } else {
+
         const _type = await verifyType(id)
         if(_type === 'TEXT'){
           const readMoreButtonSuper = document.querySelector(
@@ -122,14 +130,16 @@ export function AppExt(): React.ReactElement {
         }else if(_type === 'SHARED_IMG'){
           getSharedImage(id)
         }        
+
       }
     } catch (err) {
-      console.error("Failed handler checkbox. ", err);
+      console.log("Failed handler checkbox. ", err);
     }
   };
 
   const getText = async (id:string) => {
     try{
+      console.log("@> starting the process of getting the text :: ", id)
       const msgObj: IMessageObject = {
         id: id,
         title: null,
@@ -169,9 +179,59 @@ export function AppExt(): React.ReactElement {
       }
       addMessage(msgObj);
     }catch (err) {
-      console.error("Failed get text. ", err);
+      console.log("Failed get text. ", err);
     }
   }
+
+
+  // const getText_V1 = async (id: string) => {
+  //   try {
+  //       const msgObj: IMessageObject = {
+  //         id: id,
+  //         title: null,
+  //         message: null,
+  //       };
+  //       const selectorCopyableText =
+  //         '[extapp="' + "ext-" + id + '"] .copyable-text';
+  //       const copyableTextNodes =
+  //         document.querySelectorAll(selectorCopyableText); 
+  //       copyableTextNodes.forEach(async (node) => {
+  //         if (node.nodeName == "DIV") {
+  //           msgObj.title = node.attributes.getNamedItem(
+  //             "data-pre-plain-text"
+  //           )?.value;
+  //         }
+  //         if (node.localName == "span") {
+  //           const elementText = node.firstChild as HTMLElement;
+  //           msgObj.message = elementText.innerHTML;            
+  //           if (elementText.localName == "span") {
+  //             for (let index = 0; index < elementText.children.length; index++) {
+  //               const child = elementText.children[index] as HTMLElement;
+  //               if (child.tagName == "IMG") {
+  //                 const altAttribute =
+  //                   child.attributes.getNamedItem("alt")?.value;
+  //                 msgObj.message = await replaceEmoticon(
+  //                   msgObj.message,
+  //                   altAttribute
+  //                 );
+  //               }
+  //               if (child.tagName == "A") {
+  //                 const hrefAttribute =
+  //                   child.attributes.getNamedItem("href")?.value;
+  //                 msgObj.message = await replaceLinkSource(
+  //                   msgObj.message,
+  //                   hrefAttribute
+  //                 );
+  //               }
+  //             }
+  //           }
+  //         }
+  //       });
+  //       addMessage(msgObj);
+  //   } catch (err) {
+  //     console.log("Failed get text. ", err);
+  //   }
+  // };
 
   const getAudio = async (id:string) => {
     const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .xmUYL')
@@ -204,6 +264,7 @@ export function AppExt(): React.ReactElement {
     (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
   }
 
+
   const createContainerCheckBox = (parent: HTMLElement, uniqueID: string) => {
     try {
       const root = document.createElement("div");
@@ -220,7 +281,7 @@ export function AppExt(): React.ReactElement {
         </React.StrictMode>
       );
     } catch (err) {
-      console.error("Failed create checkbox container. ", err);
+      console.log("Failed create checkbox container. ", err);
     }
   };
 
@@ -245,7 +306,7 @@ export function AppExt(): React.ReactElement {
         setErrorMsg("Entre em uma conversa para selecionar as mensagens.");
       }
     } catch (err) {
-      console.error("Failed show checkbox. ", err);
+      console.log("Failed show checkbox. ", err);
     }
   };
 
@@ -261,7 +322,7 @@ export function AppExt(): React.ReactElement {
         });
       }
     } catch (err) {
-      console.error("Failed remove checkbox. ", err);
+      console.log("Failed remove checkbox. ", err);
     }
   };
 
@@ -281,7 +342,7 @@ export function AppExt(): React.ReactElement {
         setIsSelectAllMsgs(true)
       }
     } catch (err) {
-      console.error("Failed select all messages. ", err);
+      console.log("Failed select all messages. ", err);
     }
   };
 
