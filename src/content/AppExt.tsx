@@ -88,6 +88,20 @@ export function AppExt(): React.ReactElement {
     }
   };
 
+  const verifyType = async (id:string) => {
+    const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] div ._3rsWd span')
+    const isTextType = document.querySelector('[extapp="' + "ext-" + id + '"] div .copyable-text')
+    const isImageType = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .cm280p3y .lhggkp7q img')
+
+    if(isAudioType){
+      return 'AUDIO'
+    }else if(isTextType){
+      return 'TEXT'
+    }else if(isImageType){
+      return 'SHARED_IMG'
+    }
+  }
+
   const checkboxChangeHandler = async (id: string, checked: boolean) => {
     try {
       console.log("@> click in CheckBox.")
@@ -95,20 +109,28 @@ export function AppExt(): React.ReactElement {
         console.log("@> Unchecked.")
         removeMessage(id);
       } else {
-        console.log("@> CheckBox started to obtain the text.")
-        const readMoreButtonSuper = document.querySelector(
-          '[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button'
-        );        
-        if (readMoreButtonSuper) {
-          readMoreButtonSuper.addEventListener("click", () => {
-            setTimeout(() => {
-              getText(id);
-            }, 500);
-          });
-          (readMoreButtonSuper as HTMLElement).click();
-        } else {          
-          getText(id);
-        }
+
+        const _type = await verifyType(id)
+        if(_type === 'TEXT'){
+          const readMoreButtonSuper = document.querySelector(
+            '[extapp="' + "ext-" + id + '"] .copyable-text .read-more-button'
+          );
+          if (readMoreButtonSuper) {
+            readMoreButtonSuper.addEventListener("click", () => {
+              setTimeout(() => {
+                getText(id);
+              }, 500);
+            });
+            (readMoreButtonSuper as HTMLElement).click();
+          } else {                    
+            getText(id);
+          }          
+        }else if(_type === 'AUDIO'){
+          getAudio(id)
+        }else if(_type === 'SHARED_IMG'){
+          getSharedImage(id)
+        }        
+
       }
     } catch (err) {
       console.log("Failed handler checkbox. ", err);
@@ -161,6 +183,7 @@ export function AppExt(): React.ReactElement {
     }
   }
 
+
   // const getText_V1 = async (id: string) => {
   //   try {
   //       const msgObj: IMessageObject = {
@@ -209,6 +232,38 @@ export function AppExt(): React.ReactElement {
   //     console.log("Failed get text. ", err);
   //   }
   // };
+
+  const getAudio = async (id:string) => {
+    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .xmUYL')
+    const mouseoverEvent = new MouseEvent('mouseover', {
+      bubbles: true,
+      cancelable: true,
+    });
+    (divForHoverEvent as Element).addEventListener("onmouseover", () => {
+      setTimeout(() => {
+        const spanContext = document.querySelector('[extapp="' + "ext-" + id + '"] span ._1bGUW div') as HTMLElement
+        (spanContext as Element).addEventListener("click", () => {
+          setTimeout(() => {
+            const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
+            document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
+            (menuContext as HTMLElement).click();
+           }, 500);
+        });
+        (spanContext as HTMLElement).click();
+      }, 500);
+    });
+    (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
+  }
+
+  const getSharedImage = async (id:string) => {
+    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .cm280p3y')
+    const mouseoverEvent = new MouseEvent('mouseover', {
+      bubbles: true,
+      cancelable: true,
+    });
+    (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
+  }
+
 
   const createContainerCheckBox = (parent: HTMLElement, uniqueID: string) => {
     try {
@@ -329,14 +384,14 @@ export function AppExt(): React.ReactElement {
             Selecionar mensagens
           </Button>
         )}
-
-        {messages && messages.length>0 && (
-            <>
-            <ShowText id="output">{copiedText}</ShowText>
+        {copiedText && (            
+          <ShowText id="output">{copiedText}</ShowText>            
+        )}
+        {messages && messages.length>0 && (            
             <Button id="cancel" typeButton="danger" onClick={clearDataAction}>
               Apagar mensagens
             </Button>
-            </>
+            
         )}
 
         {errorMsg && (
