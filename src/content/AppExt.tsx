@@ -89,7 +89,9 @@ export function AppExt(): React.ReactElement {
   };
 
   const verifyType = async (id:string) => {
-    const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] div ._3rsWd span')
+    const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] [data-icon="audio-play"]') || 
+    document.querySelector('[extapp="' + "ext-" + id + '"] [data-icon="audio-pause"]')
+    
     const isTextType = document.querySelector('[extapp="' + "ext-" + id + '"] div .copyable-text')
     const isImageType = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .cm280p3y .lhggkp7q img')
 
@@ -182,8 +184,6 @@ export function AppExt(): React.ReactElement {
       console.log("Failed get text. ", err);
     }
   }
-
-
   // const getText_V1 = async (id: string) => {
   //   try {
   //       const msgObj: IMessageObject = {
@@ -234,25 +234,28 @@ export function AppExt(): React.ReactElement {
   // };
 
   const getAudio = async (id:string) => {
-    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div .UzMP7 .xmUYL')
+    console.log("@> Get Audio.")
+    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div div div ._amk6')
     const mouseoverEvent = new MouseEvent('mouseover', {
       bubbles: true,
       cancelable: true,
     });
-    (divForHoverEvent as Element).addEventListener("onmouseover", () => {
-      setTimeout(() => {
-        const spanContext = document.querySelector('[extapp="' + "ext-" + id + '"] span ._1bGUW div') as HTMLElement
-        (spanContext as Element).addEventListener("click", () => {
-          setTimeout(() => {
-            const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
-            document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
-            (menuContext as HTMLElement).click();
-           }, 500);
-        });
-        (spanContext as HTMLElement).click();
-      }, 500);
-    });
-    (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
+    if(divForHoverEvent){
+      (divForHoverEvent as Element).addEventListener("onmouseover", () => {
+        setTimeout(() => {
+          const spanContext = divForHoverEvent.querySelector('span [role="button"]') as HTMLElement
+          (spanContext as Element).addEventListener("click", () => {
+            setTimeout(() => {
+              const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
+              document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
+              (menuContext as HTMLElement).click();
+            }, 500);
+          });
+          (spanContext as HTMLElement).click();
+        }, 500);
+      });
+      (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
+    }
   }
 
   const getSharedImage = async (id:string) => {
