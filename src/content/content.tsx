@@ -7,33 +7,37 @@ import { AppExtCRM } from "./AppExtCRM";
 
 function insertAppExt() {
   try {
-    console.log("Hello! - insert App Ext");
+    console.log("Hello! - App Ext");
     if(document.querySelector("#crx-root")){
       console.log("@> exist App Ext")
       return
     }
-    if (window.location.hostname.includes("whatsapp")) {      
-      const appComponent = document.querySelector("#app") as HTMLElement;
-      if (appComponent) {
-        appComponent.style.setProperty("max-width", "100%", "important");
-        appComponent.style.setProperty(
-          "width",
-          "calc(100% - 300px)",
-          "important"
-        );
+    if (window.location.hostname.includes("whatsapp")) {
+      console.log("On Wpp! - inserting App Ext");       
+      setTimeout(() => {            
+        const appComponent = document.querySelector("#app") as HTMLElement;        
+        if (appComponent) {
+          appComponent.style.setProperty("max-width", "100%", "important");
+          appComponent.style.setProperty(
+            "width",
+            "calc(100% - 300px)",
+            "important"
+          );
 
-        const root = document.createElement("div");
-        root.id = "crx-root";
-        appComponent.appendChild(root);
-        ReactDOM.createRoot(root).render(
-          <React.StrictMode>
-            <AppExt />
-          </React.StrictMode>
-        );
-      }      
+          const root = document.createElement("div");
+          root.id = "crx-root";
+          appComponent.appendChild(root);          
+          ReactDOM.createRoot(root).render(
+            <React.StrictMode>
+              <AppExt />
+            </React.StrictMode>
+          );
+        } 
+      }, 500);     
     }
 
     if (window.location.hostname.includes("clientarcrm")) {
+      console.log("On Clientar! - inserting App Ext");
       const crmComponentNew = document.querySelector(
         "#main-wrapper"
       ) as HTMLElement;
