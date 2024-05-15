@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
@@ -28,7 +29,7 @@ export function AppExt(): React.ReactElement {
     try {
       if (isFirstRender) {
         const menuWpElements = document.querySelectorAll(
-          "#app ._3RGKj .g0rxnol2"
+          "#app ._aigw"
         );
         if (menuWpElements && menuWpElements.length > 0) {
           menuWpElements.forEach((ele) => {
@@ -234,25 +235,27 @@ export function AppExt(): React.ReactElement {
   // };
 
   const getAudio = async (id:string) => {
-    console.log("@> Get Audio.")
-    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div div div ._amk6')
+    console.log("@> Get Audio..")
+    const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div div div')
     const mouseoverEvent = new MouseEvent('mouseover', {
       bubbles: true,
       cancelable: true,
     });
-    if(divForHoverEvent){
-      (divForHoverEvent as Element).addEventListener("onmouseover", () => {
+    if(divForHoverEvent){   
+      (divForHoverEvent as HTMLElement).addEventListener("mouseover", () => {
+        console.log("@> Get Audio: Event Listener: hover")
         setTimeout(() => {
-          const spanContext = divForHoverEvent.querySelector('span [role="button"]') as HTMLElement
-          (spanContext as Element).addEventListener("click", () => {
+          const spanContext = document.querySelector('[extapp="' + "ext-" + id + '"] span [role="button"] span') as HTMLElement
+          (spanContext as HTMLElement).addEventListener("click", () => {
+            console.log("@> Get Audio: Event Listener: click")
             setTimeout(() => {
               const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
               document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
               (menuContext as HTMLElement).click();
-            }, 500);
+            }, 300);
           });
           (spanContext as HTMLElement).click();
-        }, 500);
+        }, 300);
       });
       (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
     }
