@@ -10,6 +10,9 @@ import { generateID } from "../shared/generateID";
 import { IMessageObject } from "../shared/IMessageObject";
 import { sortMessages } from "../shared/sortMessages";
 import { extractListItemText, extractStrongText, replaceEmoticon, replaceLinkSource } from "../shared/utils";
+import { IMediaObject } from "../shared/IMediaObject";
+import { MediaType } from "../shared/MediaType";
+import { ShowMediaList } from "../components/ShowMediaList";
 
 export function AppExt(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
@@ -18,6 +21,7 @@ export function AppExt(): React.ReactElement {
   const [selectMsgs, setSelectMsgs] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [messages, setMessages] = useState<IMessageObject[]>([]);
+  const [mediaList, setMediaList] = useState<IMediaObject[]>([]);
 
   useEffect(() => {
     if (selectMsgs) {
@@ -53,16 +57,31 @@ export function AppExt(): React.ReactElement {
   };
   addEventClearAll();
 
-  const addMessage = (messageObject: IMessageObject) => {
+  const addMessage = async(messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
       console.log("@> added new message with obtained text :: ", messageObject.id)
       console.log("@> Message title: ", messageObject.title)
+
+      // messageObject.message = await extractStrongText(messageObject.message) || messageObject.message
       setMessages((old) => [...old, messageObject]);
     }
   };
   const removeMessage = (id: string) => {
     setMessages((prevMessages) =>
       prevMessages.filter((message) => message.id !== id)
+    );
+  };
+
+  const addMedia = (mediaObject: IMediaObject) => {
+    if (mediaObject.id && mediaObject.type && mediaObject.message) {
+      console.log("@> added new media on list :: ", mediaObject.id)
+      console.log("@> Message message: ", mediaObject.message)
+      setMediaList((old) => [...old, mediaObject]);
+    }
+  };
+  const removeMedia = (id: string) => {
+    setMediaList((prevMedia) =>
+      prevMedia.filter((media) => media.id !== id)
     );
   };
 
@@ -111,6 +130,7 @@ export function AppExt(): React.ReactElement {
       if (!checked) {
         console.log("@> Unchecked.")
         removeMessage(id);
+        removeMedia(id);
       } else {
 
         const _type = await verifyType(id)
@@ -129,7 +149,7 @@ export function AppExt(): React.ReactElement {
             getText(id);
           }          
         }else if(_type === 'AUDIO'){
-          getAudio(id)
+          getAudioInfos(id) //getAudio(id)
         }else if(_type === 'SHARED_IMG'){
           getSharedImage(id)
         }        
@@ -233,7 +253,23 @@ export function AppExt(): React.ReactElement {
   //     console.log("Failed get text. ", err);
   //   }
   // };
+  const getAudioInfos = async (id:string) => {
+    console.log("@> Get Infos about Audio.")
+    const  senderNameHTML = document.querySelector('[extapp="' + "ext-" + id + '"] div div div div span')
+    const  senderTimeHTML = document.querySelector('[extapp="' + "ext-" + id + '"] ._ak4s .x1rg5ohu')
+    const  senderDurationHTML = document.querySelector('[extapp="' + "ext-" + id + '"] ._ak8w')
 
+    const senderName = ((senderNameHTML as HTMLElement).attributes.getNamedItem("aria-label")?.value || 'Contact').replace(':','');
+    const senderTime = (senderTimeHTML as HTMLElement).innerText || '0';
+    const senderDuration = (senderDurationHTML as HTMLElement).innerText || '0';
+
+    const mediaObj: IMediaObject = {
+      id: id,
+      message: `Enviado por ${senderName} às ${senderTime}. Duração: ${senderDuration}`,
+      type: MediaType.Audio
+    };
+    addMedia(mediaObj)
+  }
   const getAudio = async (id:string) => {
     console.log("@> Get Audio..")
     const divForHoverEvent = document.querySelector('[extapp="' + "ext-" + id + '"] div div div')
@@ -356,6 +392,7 @@ export function AppExt(): React.ReactElement {
     setIsSelectAllMsgs(false)
     setCopiedText(null)
     setMessages([]);
+    setMediaList([]);
     removeSelectMessages();
     clearOutput();
     await chrome.storage.local.set({ "clipboard-AppExt": null })
@@ -390,16 +427,28 @@ export function AppExt(): React.ReactElement {
             Selecionar mensagens
           </Button>
         )}
-        {copiedText && (            
-          <ShowText id="output">{copiedText}</ShowText>            
+
+        {/* <div className="overflow-y-none max-h-72"> */}
+        {messages && messages.length>0 && (         
+          <>
+            <ShowText id="output" data={messages}></ShowText>
+            <div className="relative flex items-center">
+              <div className="flex-grow border-t border-gray-500"></div>
+              <div className="flex-grow border-t border-gray-500"></div>
+            </div>
+          </>            
         )}
+        {mediaList && mediaList.length>0 && (            
+          <ShowMediaList id="outputMedia" data={mediaList} />
+        )}
+        {/* </div> */}
+
         {messages && messages.length>0 && (            
             <Button id="cancel" typeButton="danger" onClick={clearDataAction}>
               Apagar mensagens
             </Button>
             
         )}
-
         {errorMsg && (
           <span className="text-sm text-pretty text-red-500 tracking-wide">
             {errorMsg}

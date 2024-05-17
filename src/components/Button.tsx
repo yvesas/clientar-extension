@@ -4,7 +4,7 @@ import { ButtonHTMLAttributes, ReactNode } from 'react'
 
 export interface ButtonProps {
   id: string
-  typeButton?: 'primary' | 'secondary' | 'danger'
+  typeButton?: 'primary' | 'secondary' | 'danger' | 'valid'
   children: ReactNode
   loading?: boolean
   onClick?: (e:any) => void;
@@ -28,6 +28,8 @@ export function Button({
       return 'bg-[#f5a523] text-white hover:bg-[#f5a523b6]'
     } else if (typeButton === 'danger') {
       return 'bg-[#DC143C] text-white hover:bg-[#dc143cc9]'
+    } else if (typeButton === 'valid') {
+      return 'bg-[#20a725] text-white hover:bg-[#20a725]'
     } else {
       return ''
     }

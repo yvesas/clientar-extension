@@ -18,7 +18,7 @@ export function Container({ children }: ComponentProps) {
           {/* <span className="flex-shrink mx-4 text-gray-700">Content</span> */}
           <div className="flex-grow border-t border-gray-400"></div>
       </div>           
-      <div className="flex flex-col gap-y-8">
+      <div className="flex flex-col gap-y-4">
         {children}
       </div>      
     </div>
