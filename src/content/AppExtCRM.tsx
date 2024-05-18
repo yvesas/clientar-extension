@@ -13,8 +13,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
   const [isFirstRender, setIsFirstRender] = useState(true);
 
   const removeClipButtons = async () => {
-    try {
-      await chrome.storage.local.set({ "clipboard-AppExt": null })
+    try {      
       const elements = document.querySelectorAll("#crx-root-btn");
       if (elements) {
         elements.forEach((ele) => {
@@ -105,11 +104,13 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
           finishProcess = await clipMessageForNewVersion()
           if(finishProcess){          
             removeClipButtons();
+            await chrome.storage.local.set({ "clipboard-AppExt": 'It was pasted.' })
           }  
         }else{         
           finishProcess = await clipMessageForOldVersion(uniqueId)
           if(finishProcess){          
             removeClipButtons();
+            await chrome.storage.local.set({ "clipboard-AppExt": 'It was pasted.' })
           }  
         }              
       }      
@@ -249,8 +250,8 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
   const haveNewMessages = async () => {
     try{
         const result = await chrome.storage.local.get("clipboard-AppExt")
-        const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []
-          if(clipMessages && clipMessages.length>0){            
+        const clipMessages = result["clipboard-AppExt"] ? result["clipboard-AppExt"] : []        
+        if(clipMessages && Array.isArray(clipMessages) && clipMessages.length>0){            
             for (const item of clipMessages) {              
               if (item.title && !validateText(item.title)) {
                 return false;

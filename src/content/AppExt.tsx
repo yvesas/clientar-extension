@@ -9,7 +9,7 @@ import CheckboxStyle from "../components/CheckboxStyle";
 import { generateID } from "../shared/generateID";
 import { IMessageObject } from "../shared/IMessageObject";
 import { sortMessages } from "../shared/sortMessages";
-import { extractListItemText, extractStrongText, replaceEmoticon, replaceLinkSource } from "../shared/utils";
+import { extractListItemText, replaceEmoticon, replaceLinkSource } from "../shared/utils";
 import { IMediaObject } from "../shared/IMediaObject";
 import { MediaType } from "../shared/MediaType";
 import { ShowMediaList } from "../components/ShowMediaList";
@@ -17,7 +17,7 @@ import { ShowMediaList } from "../components/ShowMediaList";
 export function AppExt(): React.ReactElement {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [isSelectAllMsgs, setIsSelectAllMsgs] = useState(false);
-  const [copiedText, setCopiedText] = useState<string | null>(null);
+  // const [copiedText, setCopiedText] = useState<string | null>(null);
   const [selectMsgs, setSelectMsgs] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [messages, setMessages] = useState<IMessageObject[]>([]);
@@ -28,6 +28,16 @@ export function AppExt(): React.ReactElement {
       setErrorMsg(null);
     }
   }, [selectMsgs, isFirstRender]);
+ 
+  useEffect(() => {
+    async function updateStorage() {
+      const messagesOrdered = sortMessages(messages);  
+      await chrome.storage.local.set({
+        "clipboard-AppExt": messagesOrdered
+      });
+    }
+    updateStorage();
+  }, [messages]);
 
   const addEventClearAll = () => {
     try {
@@ -45,9 +55,10 @@ export function AppExt(): React.ReactElement {
         }
         chrome.storage.onChanged.addListener(
           function(changes) {
-            if(changes && changes["clipboard-AppExt"] && !changes["clipboard-AppExt"].newValue){
-              clearDataAction();
-            }
+            if(changes && changes["clipboard-AppExt"] && changes["clipboard-AppExt"].newValue === 'It was pasted.'){
+              console.log("@> changes['clipboard-AppExt']: ", changes["clipboard-AppExt"])       
+              clearDataAction(true);              
+            } 
           }
         );
       }
@@ -59,23 +70,22 @@ export function AppExt(): React.ReactElement {
 
   const addMessage = async(messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
-      console.log("@> added new message with obtained text :: ", messageObject.id)
-      console.log("@> Message title: ", messageObject.title)
-
-      // messageObject.message = await extractStrongText(messageObject.message) || messageObject.message
+      // console.log("@> added new message with obtained text :: ", messageObject.id)
+      // console.log("@> Message title: ", messageObject.title)       
       setMessages((old) => [...old, messageObject]);
     }
   };
-  const removeMessage = (id: string) => {
-    setMessages((prevMessages) =>
+  const removeMessage = (id: string) => {      
+    setMessages((prevMessages) => 
       prevMessages.filter((message) => message.id !== id)
     );
   };
+ 
 
   const addMedia = (mediaObject: IMediaObject) => {
     if (mediaObject.id && mediaObject.type && mediaObject.message) {
-      console.log("@> added new media on list :: ", mediaObject.id)
-      console.log("@> Message message: ", mediaObject.message)
+      // console.log("@> added new media on list :: ", mediaObject.id)
+      // console.log("@> Message message: ", mediaObject.message)
       setMediaList((old) => [...old, mediaObject]);
     }
   };
@@ -85,28 +95,28 @@ export function AppExt(): React.ReactElement {
     );
   };
 
-  const copyAction = async () => {
-    try {
-      console.log("@> starting process of copying")
-      if (messages && messages.length > 0) {
-        const messagesOrdered = await sortMessages(messages);
-        let fullText = "";
-        messagesOrdered.forEach((item: any, index: any) => {
-          if (index > 0) {
-            fullText += item.title + " " + item.message + "\n";
-          } else {
-            fullText = item.title + " " + item.message + "\n";
-          }
-        });
-          setCopiedText(await extractStrongText(fullText) || fullText);      
-          await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
-      }else{
-        console.log("@> anything to copy. there are no message! ")
-      }
-    } catch (err) {
-      console.log("Failed copy action. ", err);
-    }
-  };
+  // const copyAction = async () => {
+  //   try {
+  //     console.log("@> starting process of copying")
+  //     if (messages && messages.length > 0) {
+  //       const messagesOrdered = await sortMessages(messages);
+  //       let fullText = "";
+  //       messagesOrdered.forEach((item: any, index: any) => {
+  //         if (index > 0) {
+  //           fullText += item.title + " " + item.message + "\n";
+  //         } else {
+  //           fullText = item.title + " " + item.message + "\n";
+  //         }
+  //       });
+  //         setCopiedText(await extractStrongText(fullText) || fullText);      
+  //         await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
+  //     }else{
+  //       console.log("@> anything to copy. there are no message! ")
+  //     }
+  //   } catch (err) {
+  //     console.log("Failed copy action. ", err);
+  //   }
+  // };
 
   const verifyType = async (id:string) => {
     const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] [data-icon="audio-play"]') || 
@@ -162,7 +172,7 @@ export function AppExt(): React.ReactElement {
 
   const getText = async (id:string) => {
     try{
-      console.log("@> starting the process of getting the text :: ", id)
+      // console.log("@> starting the process of getting the text :: ", id)
       const msgObj: IMessageObject = {
         id: id,
         title: null,
@@ -333,7 +343,7 @@ export function AppExt(): React.ReactElement {
         '#main [role="application"] [role="row"]'
       );
       if (rowsChats && rowsChats.length > 0) {
-        clearOutput();
+        // clearOutput();
         setSelectMsgs(true);
         rowsChats.forEach((row) => {
           row.querySelector("#crx-root-chkbx")?.remove(); //remove duplicate items.
@@ -388,22 +398,24 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const clearDataAction = async () => {
+  const clearDataAction = async (pasted = false) => {
     setIsSelectAllMsgs(false)
-    setCopiedText(null)
+    // setCopiedText(null)
     setMessages([]);
     setMediaList([]);
     removeSelectMessages();
-    clearOutput();
-    await chrome.storage.local.set({ "clipboard-AppExt": null })
+    // clearOutput();
+    if(!pasted){
+      await chrome.storage.local.set({ "clipboard-AppExt": 'reset' })
+    }
   };
 
-  const clearOutput = () => {
-    const output = document.querySelector("#output")
-      ? document.querySelector("#output")
-      : null;
-    if (output) output.innerHTML = "";
-  };
+  // const clearOutput = () => {
+  //   const output = document.querySelector("#output")
+  //     ? document.querySelector("#output")
+  //     : null;
+  //   if (output) output.innerHTML = "";
+  // };
 
   return (
     <>
@@ -415,12 +427,11 @@ export function AppExt(): React.ReactElement {
                 Selecionar mensagens recentes
               </Button>
             )}
-
-            {messages && messages.length > 0 && (
+            {/* {messages && messages.length > 0 && (
               <Button id="copyButton" typeButton="secondary" onClick={copyAction}>
                 Copiar as mensagens
               </Button>
-            )}
+            )} */}
           </div>
         ) : (
           <Button id="selectMsgBtn" onClick={showSelectMessages}>
@@ -431,7 +442,7 @@ export function AppExt(): React.ReactElement {
         {/* <div className="overflow-y-none max-h-72"> */}
         {messages && messages.length>0 && (         
           <>
-            <ShowText id="output" data={messages}></ShowText>
+            <ShowText data={sortMessages(messages)}></ShowText>
             <div className="relative flex items-center">
               <div className="flex-grow border-t border-gray-500"></div>
               <div className="flex-grow border-t border-gray-500"></div>
@@ -439,7 +450,7 @@ export function AppExt(): React.ReactElement {
           </>            
         )}
         {mediaList && mediaList.length>0 && (            
-          <ShowMediaList id="outputMedia" data={mediaList} />
+          <ShowMediaList data={mediaList} handlerData={getAudio} />
         )}
         {/* </div> */}
 
