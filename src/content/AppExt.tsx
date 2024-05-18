@@ -56,7 +56,6 @@ export function AppExt(): React.ReactElement {
         chrome.storage.onChanged.addListener(
           function(changes) {
             if(changes && changes["clipboard-AppExt"] && changes["clipboard-AppExt"].newValue === 'It was pasted.'){
-              console.log("@> changes['clipboard-AppExt']: ", changes["clipboard-AppExt"])       
               clearDataAction(true);              
             } 
           }
@@ -287,22 +286,32 @@ export function AppExt(): React.ReactElement {
       bubbles: true,
       cancelable: true,
     });
-    if(divForHoverEvent){   
-      (divForHoverEvent as HTMLElement).addEventListener("mouseover", () => {
+    if(divForHoverEvent){
+      
+      const handlerSpanClick = () => {
+        console.log("@> Get Audio: Event Listener: click")
+        setTimeout(() => {
+          const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
+          document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
+          (menuContext as HTMLElement).click();          
+          removeEventListenerAfterClick();
+        }, 300);
+      }
+
+      const handleDivHover =  () => {
         console.log("@> Get Audio: Event Listener: hover")
         setTimeout(() => {
-          const spanContext = document.querySelector('[extapp="' + "ext-" + id + '"] span [role="button"] span') as HTMLElement
-          (spanContext as HTMLElement).addEventListener("click", () => {
-            console.log("@> Get Audio: Event Listener: click")
-            setTimeout(() => {
-              const menuContext = document.querySelector('div [role="application"] li [aria-label="Baixar"]') as HTMLElement ||
-              document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
-              (menuContext as HTMLElement).click();
-            }, 300);
-          });
+          const spanContext = document.querySelector('[extapp="' + "ext-" + id + '"] span [role="button"] span') as HTMLElement          
+          (spanContext as HTMLElement).addEventListener("click", handlerSpanClick);
           (spanContext as HTMLElement).click();
         }, 300);
-      });
+      }
+      
+      const removeEventListenerAfterClick = () => {        
+        (divForHoverEvent as HTMLElement).removeEventListener("mouseover", handleDivHover);
+      };
+      
+      (divForHoverEvent as HTMLElement).addEventListener("mouseover", handleDivHover);
       (divForHoverEvent as Element).dispatchEvent(mouseoverEvent);
     }
   }
