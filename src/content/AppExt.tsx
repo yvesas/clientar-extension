@@ -39,7 +39,7 @@ export function AppExt(): React.ReactElement {
     updateStorage();
   }, [messages]);
 
-  const addEventClearAll = () => {
+  const addListeners = () => {
     try {
       if (isFirstRender) {
         const menuWpElements = document.querySelectorAll(
@@ -60,12 +60,19 @@ export function AppExt(): React.ReactElement {
             } 
           }
         );
-      }
+
+        console.log('@> chrome objetct: ', chrome)
+
+        chrome.downloads?.onChanged.addListener(function(delta) {
+          console.log('@> chrome.downloads.onChange : ', delta)
+        });
+
+      }      
     } catch (err) {
-      console.log("Failed add event Clear. ", err);
+      console.log("Failed add listeners. ", err);
     }
   };
-  addEventClearAll();
+  addListeners();
 
   const addMessage = async(messageObject: IMessageObject) => {
     if (messageObject.id && messageObject.title && messageObject.message) {
