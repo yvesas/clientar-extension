@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { ButtonClip } from "../components/ButtonClip";
 import { generateID } from "../shared/generateID";
 import { extractStrongText, removeEmotions, validateText } from "../shared/utils";
+import BadgeFiles from "../components/BadgeFiles";
 
 export interface AppExtCrmProps {
   newVersion: boolean
 }
 
 export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElement {
-  const [isFirstRender, setIsFirstRender] = useState(true);
+  // const [isFirstRender, setIsFirstRender] = useState(true);
 
   const removeClipButtons = async () => {
     try {      
@@ -120,7 +121,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   };
 
-  const renderComponent = (element:HTMLElement | null, id:string|null) => {    
+  const renderClipButtonComponent = (element:HTMLElement | null, id:string|null) => {    
     if(element){
       const typeButton = newVersion ? "new" : "old"
       const buttonID = id ? id : "clipAction"
@@ -191,7 +192,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
             "important"
           );
                 
-        renderComponent(root, null)
+        renderClipButtonComponent(root, null)
       
     } catch (err) {
       console.error("Failed create container for new version. ", err);
@@ -237,7 +238,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
               "important"
             );
             
-            renderComponent(root as HTMLElement, uniqueID)
+            renderClipButtonComponent(root as HTMLElement, uniqueID)
           }
 
         })
@@ -305,36 +306,153 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
     }
   };
 
-  const observer = new MutationObserver(() => {
+  const removeBadgeUploads = async () => {
+    try {      
+      const elements = document.querySelectorAll("#crx-root-badge");
+      if (elements) {
+        elements.forEach((ele) => {
+          ele?.remove();
+        });
+      }
+    } catch (err) {
+      console.error("Failed remove Upload Files Badge. ", err);
+    }
+  };
+  
+  const haveNewUploads = async () => {
+    try{
+      const result = await chrome.storage.local.get("AppExt-Files");
+      const downloadList = result["AppExt-Files"] || [];     
+        if(downloadList && Array.isArray(downloadList) && downloadList.length>0){              
+            return true;
+          }else{
+            return false
+          }    
+    }catch(err){
+      return false
+    }
+  }
+
+  const createBadgeForNewVersion = async (hookElement:HTMLElement) => {
+    try { 
+        hookElement.querySelector("#crx-root-badge")?.remove();                   
+        const root = document.createElement("div");
+        root.id = "crx-root-badge";        
+        hookElement.appendChild(root);
+        hookElement.style.setProperty(
+            "position",
+            "relative",
+            "important"
+          );
+          hookElement.style.setProperty(
+            "display",
+            "inline-flex",
+            "important"
+          );
+
+          hookElement.addEventListener("click", ()=>{
+            chrome.storage.local.set({ "AppExt-Files": 'It was uploaded.'})
+          })
+
+          const result = await chrome.storage.local.get("AppExt-Files");
+          const listFiles = result["AppExt-Files"] && Array.isArray(result["AppExt-Files"]) ? result["AppExt-Files"] : [];          
+                    
+          ReactDOM.createRoot(root).render(
+            <React.StrictMode>
+              <BadgeFiles listFiles={listFiles}/>
+            </React.StrictMode>
+          );
+      
+    } catch (err) {
+      console.error("Failed create anchor Badge for new version.", err);
+      return;
+    }
+  }
+
+  const anchorBadgeDownloadNew = () => {
+    let ButtonContainer = null
+      ButtonContainer = document.querySelector(
+        "div div.el-upload") as HTMLElement;    
+    return ButtonContainer
+  }
+  const anchorBadgeDownloadOld = () => {
+    let ButtonContainer = null
+      ButtonContainer = document.querySelector(
+        "div .qq-upload-button-selector .ui-button") as HTMLElement;    
+    return ButtonContainer
+  }
+
+  const showBadgeFiles = async () => {
+    try {
+      if(newVersion){      
+        const anchor = anchorBadgeDownloadNew()      
+        if (anchor) {
+          if(await haveNewUploads()){
+            // const badge =
+            // anchor.querySelector("#crx-root-badge");
+            // if (badge) {
+            //   return;
+            // }else {               
+              createBadgeForNewVersion(anchor);  
+            // }  
+          } else {
+            removeBadgeUploads();            
+          }
+        }
+      }else{
+        const anchor = anchorBadgeDownloadOld()      
+        if (anchor) {
+          if(await haveNewUploads()){
+            const badge =
+            document.querySelector("#crx-root-badge");
+            if (badge) {
+              return;
+            }else {               
+              createButtonContainer();  
+            }  
+          } else {
+            removeBadgeUploads();            
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed show clip button. ", err);
+      return;
+    }
+  };
+  // const observer = new MutationObserver(() => {
     // for (const mutation of mutations) {
     //   if (mutation.type === 'childList') {
     //     for (const addedNode of mutation.addedNodes) {
     //       if (addedNode.classList.contains('editor__button')) {    
-    showButtonClip();
+    // showButtonClip();
     //       }
     //     }
     //   }
     // }
-  });
+  // });
 
   const addListeners = () => {
     try {
-      if (isFirstRender) {
-        setIsFirstRender(false);
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
+      // if (isFirstRender) {
+      //   setIsFirstRender(false);
+      //   observer.observe(document.body, {
+      //     childList: true,
+      //     subtree: true,
+      //   });
 
-        const bodyContainer = document.querySelector("body.main");
-        bodyContainer?.addEventListener("mouseover", ()=>{          
-          showButtonClip();
-        });
-      }
+      //   const bodyContainer = document.querySelector("body.main");
+      //   bodyContainer?.addEventListener("mouseover", ()=>{          
+      //     showButtonClip();
+      //   });
+      // }
       chrome.storage.onChanged.addListener(
         function(changes) {
           if(changes && changes["clipboard-AppExt"]){
             showButtonClip();
+          }
+          if(changes && changes["AppExt-Files"]){
+            showBadgeFiles();
           }
         }
       );

@@ -48,7 +48,8 @@ export function AppExt(): React.ReactElement {
         if (menuWpElements && menuWpElements.length > 0) {
           menuWpElements.forEach((ele) => {
             ele.addEventListener("click", () => {
-              clearDataAction();
+              clearDataMessages();
+              clearDataFiles()
             });
           });
           setIsFirstRender(false);
@@ -56,17 +57,15 @@ export function AppExt(): React.ReactElement {
         chrome.storage.onChanged.addListener(
           function(changes) {
             if(changes && changes["clipboard-AppExt"] && changes["clipboard-AppExt"].newValue === 'It was pasted.'){
-              clearDataAction(true);              
+              clearDataMessages(false); 
+              resetStorage()                      
+            } 
+            if(changes && changes["AppExt-Files"] && changes["AppExt-Files"].newValue === 'It was uploaded.'){              
+              clearDataFiles(false)
+              resetStorage()                       
             } 
           }
-        );
-
-        console.log('@> chrome objetct: ', chrome)
-
-        chrome.downloads?.onChanged.addListener(function(delta) {
-          console.log('@> chrome.downloads.onChange : ', delta)
-        });
-
+        );        
       }      
     } catch (err) {
       console.log("Failed add listeners. ", err);
@@ -100,29 +99,6 @@ export function AppExt(): React.ReactElement {
       prevMedia.filter((media) => media.id !== id)
     );
   };
-
-  // const copyAction = async () => {
-  //   try {
-  //     console.log("@> starting process of copying")
-  //     if (messages && messages.length > 0) {
-  //       const messagesOrdered = await sortMessages(messages);
-  //       let fullText = "";
-  //       messagesOrdered.forEach((item: any, index: any) => {
-  //         if (index > 0) {
-  //           fullText += item.title + " " + item.message + "\n";
-  //         } else {
-  //           fullText = item.title + " " + item.message + "\n";
-  //         }
-  //       });
-  //         setCopiedText(await extractStrongText(fullText) || fullText);      
-  //         await chrome.storage.local.set({ "clipboard-AppExt": messagesOrdered })
-  //     }else{
-  //       console.log("@> anything to copy. there are no message! ")
-  //     }
-  //   } catch (err) {
-  //     console.log("Failed copy action. ", err);
-  //   }
-  // };
 
   const verifyType = async (id:string) => {
     const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] [data-icon="audio-play"]') || 
@@ -414,17 +390,36 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const clearDataAction = async (pasted = false) => {
+  const clearDataMessages = async (clearStorage = true) => {
     setIsSelectAllMsgs(false)
     // setCopiedText(null)
     setMessages([]);
-    setMediaList([]);
     removeSelectMessages();
     // clearOutput();
-    if(!pasted){
+    if(clearStorage){
       await chrome.storage.local.set({ "clipboard-AppExt": 'reset' })
     }
   };
+
+  const clearDataFiles = async (clearStorage = true) => {  
+    setMediaList([]);
+    if(clearStorage){
+      await chrome.storage.local.set({ "AppExt-Files": [] })
+    }
+  };
+
+  const resetStorage = async () => {
+    const resultClipboard = await chrome.storage.local.get("clipboard-AppExt");
+    const resultFiles = await chrome.storage.local.get("AppExt-Files");
+    
+    const haveMessages = resultClipboard["clipboard-AppExt"] && Array.isArray(resultClipboard["clipboard-AppExt"]) && resultClipboard["clipboard-AppExt"].length>0 ? true : false; 
+    const haveFiles = resultFiles["AppExt-Files"] && Array.isArray(resultFiles["AppExt-Files"]) && resultFiles["AppExt-Files"].length>0 ? true : false; 
+  
+    if(!haveFiles && !haveMessages){
+      clearDataMessages(false);
+      clearDataFiles(false)
+    }
+  }
 
   // const clearOutput = () => {
   //   const output = document.querySelector("#output")
@@ -470,8 +465,8 @@ export function AppExt(): React.ReactElement {
         )}
         {/* </div> */}
 
-        {messages && messages.length>0 && (            
-            <Button id="cancel" typeButton="danger" onClick={clearDataAction}>
+        {((messages && messages.length>0) || (mediaList && mediaList.length>0)) && (            
+            <Button id="cancel" typeButton="danger" onClick={()=>{clearDataMessages(); clearDataFiles();}}>
               Apagar mensagens
             </Button>
             

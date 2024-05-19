@@ -15,8 +15,14 @@ async function addNewDownload(objDownload: any) {
   const { id, filename, endTime='', state={} } = objDownload;
 
   try {
-    const result = await chrome.storage.local.get("AppExt-Downloads");
-    const downloadList = result["AppExt-Downloads"] || [];
+    console.log("@> addNewDownload : ", objDownload);
+    
+    const result = await chrome.storage.local.get("AppExt-Files");
+    const downloadList = result["AppExt-Files"] && Array.isArray(result["AppExt-Files"]) ? result["AppExt-Files"] : [];
+    // if(downloadList && !Array.isArray(downloadList)){  
+    //   downloadList = []
+    // }            
+
     const existingDownloadIndex = downloadList.findIndex((item: any) => item.id === id);
 
     if (existingDownloadIndex !== -1) {
@@ -33,12 +39,14 @@ async function addNewDownload(objDownload: any) {
         downloadList.push({ id, filename, endTime, state });
       }      
     }
-    
-    await chrome.storage.local.set({ "AppExt-Downloads": downloadList });
+
+    await chrome.storage.local.set({ "AppExt-Files": downloadList });
 
     console.log(`Download ${id ? `(ID: ${id})` : ''} added or updated successfully. List: `, downloadList);
+    // chrome.downloads.show(id)
+
   } catch (error) {
-    console.error("Error adding or updating download:", error);
+    console.error("Error adding or updating file:", error);
   }
 }
 

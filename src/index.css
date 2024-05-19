@@ -137,3 +137,21 @@
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+
+
+.badge-files {
+  position: absolute; /* Posicionamento absoluto dentro do container */
+  top: 110%; /* Posição vertical: 4% da altura do container */
+  transform: translate(-50%, -50%); /* Centraliza o badge-files horizontal e verticalmente */
+  width: 22px; 
+  height: 22px;
+  border-radius: 50%;
+  background-color: #67C23A;
+  color: white;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+  z-index: 999;
+}
