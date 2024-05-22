@@ -155,3 +155,7 @@
   place-items: center;
   z-index: 999;
 }
+.badge-files-old {  
+  top: 50% !important;
+  right: -20%
+}

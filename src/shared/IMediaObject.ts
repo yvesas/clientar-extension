@@ -3,5 +3,6 @@ import { MediaType } from "./MediaType"
 export interface IMediaObject {
   id: string 
   message: string | null,
-  type: MediaType
+  type: MediaType,
+  downloaded: 0 | 1
 }

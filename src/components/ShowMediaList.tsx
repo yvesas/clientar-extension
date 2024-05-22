@@ -27,6 +27,19 @@ function TypeComp({media}: TypeCompProps){
   )
 }
 
+// function DownloadedComp({media}: TypeCompProps){  
+//   if(media.downloaded){
+//     return (
+//       <div className="flex flex-row gap-1">
+//         <p className="text-base underline decoration-1 decoration-slate-400 underline-offset-2 text-slate-950">Download realizado!</p>
+
+//       </div>
+//     )
+//   }else{
+//     return (<></>)
+//   }  
+// }
+
 export function ShowMediaList({ data, handlerData }: Props) {
   return (
     <div className='flex flex-col gap-y-2'>
@@ -37,7 +50,15 @@ export function ShowMediaList({ data, handlerData }: Props) {
             <div>
               <TypeComp media={media}/>          
               <p>{media.message}</p>                     
-              <div className="flex justify-end w-full">          
+              {/* <p>{media.downloaded}</p>                      */}
+              <div className="flex flex-row w-full justify-end">          
+                {/* <DownloadedComp media={media}/> */}
+                {/* {media.downloaded==1 && (
+                  <div className="flex flex-row gap-1">
+                    <p className="text-base underline decoration-1 decoration-slate-400 underline-offset-2 text-slate-950">Download realizado!</p>
+                  </div> 
+                )}            */}
+                
                 <button onClick={()=>handlerData(media.id)} 
                 className="bg-[#4d4ddb] text-white w-1/2 px-2 py-1 border rounded-lg">Baixar</button>
               </div>           

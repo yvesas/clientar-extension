@@ -48,21 +48,45 @@ export function AppExt(): React.ReactElement {
         if (menuWpElements && menuWpElements.length > 0) {
           menuWpElements.forEach((ele) => {
             ele.addEventListener("click", () => {
-              clearDataMessages();
-              clearDataFiles()
+              cancelAction()
             });
           });
           setIsFirstRender(false);
         }
         chrome.storage.onChanged.addListener(
-          function(changes) {
-            if(changes && changes["clipboard-AppExt"] && changes["clipboard-AppExt"].newValue === 'It was pasted.'){
-              clearDataMessages(false); 
-              resetStorage()                      
+          async function(changes) {
+            if(changes && changes["clipboard-AppExt"] && changes["clipboard-AppExt"].newValue === 'It was pasted.'){              
+              // chrome.storage.local.get("AppExt-Files").then((result)=>{
+              //   const files = result["AppExt-Files"];  
+              //   console.log('ACINOU o get store -> resultFiles:', files)                   
+              //   if(needAGeneralReset(changes["clipboard-AppExt"]?.newValue, files)){              
+              //     cancelAction()
+              //   }else{
+              //     clearDataMessages();
+              //   } 
+              // })               
+              if(await needAGeneralReset()){
+                cancelAction()
+              }else{
+                clearDataMessages(changes["clipboard-AppExt"].oldValue);
+              }                   
             } 
-            if(changes && changes["AppExt-Files"] && changes["AppExt-Files"].newValue === 'It was uploaded.'){              
-              clearDataFiles(false)
-              resetStorage()                       
+            if(changes && changes["AppExt-Files"]){ 
+              const newValue =  changes["AppExt-Files"].newValue                       
+              
+              if(newValue === 'It was uploaded.'){
+                if(await needAGeneralReset()){
+                  cancelAction()
+                }else{
+                  clearDataFiles(changes["AppExt-Files"].oldValue);
+                }
+              }
+              console.log('@>> NOVOS FILES', newValue)                   
+              if(Array.isArray(newValue)){
+                newValue.map((item)=>{
+                  updateMediaList(item.id)
+                })
+              }
             } 
           }
         );        
@@ -99,6 +123,14 @@ export function AppExt(): React.ReactElement {
       prevMedia.filter((media) => media.id !== id)
     );
   };
+  const updateMediaList = (id: string) => {
+    console.log("@> updateMediaList - ID:", id)
+    setMediaList((prevMedia) =>
+      prevMedia.map((media) =>
+        media.id === id ? { ...media, downloaded: 1 } : media
+      )
+    );
+  };
 
   const verifyType = async (id:string) => {
     const isAudioType = document.querySelector('[extapp="' + "ext-" + id + '"] [data-icon="audio-play"]') || 
@@ -116,9 +148,15 @@ export function AppExt(): React.ReactElement {
     }
   }
 
+  // const uncheckedHandler = (id: string) => {
+  //   // document.getElementById("checkbox").checked = false;
+  //   removeMessage(id);
+  //   removeMedia(id);
+  // }
+
   const checkboxChangeHandler = async (id: string, checked: boolean) => {
     try {
-      console.log("@> click in CheckBox.")
+      console.log("@> click in CheckBox. checked?", checked)
       if (!checked) {
         console.log("@> Unchecked.")
         removeMessage(id);
@@ -258,7 +296,8 @@ export function AppExt(): React.ReactElement {
     const mediaObj: IMediaObject = {
       id: id,
       message: `Enviado por ${senderName} às ${senderTime}. Duração: ${senderDuration}`,
-      type: MediaType.Audio
+      type: MediaType.Audio,
+      downloaded: 0
     };
     addMedia(mediaObj)
   }
@@ -278,6 +317,7 @@ export function AppExt(): React.ReactElement {
           document.querySelector('div [role="application"] li [aria-label="Download"]') as HTMLElement
           (menuContext as HTMLElement).click();          
           removeEventListenerAfterClick();
+          
         }, 300);
       }
 
@@ -354,21 +394,41 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const removeSelectMessages = () => {
+  const removeAllCheckBox = () => {
     try {
       const rowsChats = document.querySelectorAll(
         '#main [role="application"] [role="row"]'
       );
-      if (rowsChats) {
-        setSelectMsgs(false);
-        rowsChats.forEach((row) => {
-          row.querySelector("#crx-root-chkbx")?.remove();
-        });
-      }
+      if (rowsChats) {        
+          rowsChats.forEach((row) => {
+            row.querySelector("#crx-root-chkbx")?.remove();
+          });
+      }      
     } catch (err) {
-      console.log("Failed remove checkbox. ", err);
+      console.log("Failed remove all checkboxes. ", err);
     }
   };
+
+  const unselectCheckboxes = async (listToRemove?: any[]): Promise<void> => {
+    try {
+      console.log('@> Unselect Specifics > ', listToRemove);      
+      if (listToRemove && listToRemove.length > 0) {
+        setIsSelectAllMsgs(false)        
+        for (const item of listToRemove) {
+          const checkbox = document.getElementById(item.id) as HTMLInputElement;    
+          console.log(`@> Unselect Checkbox ${item.id} > `, checkbox);          
+          if (checkbox) {
+              // checkbox.checked = false;
+              // uncheckedHandler(item.id)    
+              checkboxChangeHandler(item.id, false)             
+          }
+        } 
+      } 
+    } catch (err) {
+      console.log("Failed to unselect checkboxes. ", err);
+      throw err;
+    }
+  }
 
   const selectAllMessages = () => {
     try {
@@ -390,37 +450,54 @@ export function AppExt(): React.ReactElement {
     }
   };
 
-  const clearDataMessages = async (clearStorage = true) => {
-    setIsSelectAllMsgs(false)
-    // setCopiedText(null)
+
+  const cancelAction = async () => {
+    console.log('@> call CANCEL ACTION ')
+    setSelectMsgs(false);
+    setIsSelectAllMsgs(false);
+    removeAllCheckBox();
     setMessages([]);
-    removeSelectMessages();
-    // clearOutput();
-    if(clearStorage){
-      await chrome.storage.local.set({ "clipboard-AppExt": 'reset' })
-    }
-  };
-
-  const clearDataFiles = async (clearStorage = true) => {  
     setMediaList([]);
-    if(clearStorage){
-      await chrome.storage.local.set({ "AppExt-Files": [] })
-    }
-  };
-
-  const resetStorage = async () => {
-    const resultClipboard = await chrome.storage.local.get("clipboard-AppExt");
-    const resultFiles = await chrome.storage.local.get("AppExt-Files");
-    
-    const haveMessages = resultClipboard["clipboard-AppExt"] && Array.isArray(resultClipboard["clipboard-AppExt"]) && resultClipboard["clipboard-AppExt"].length>0 ? true : false; 
-    const haveFiles = resultFiles["AppExt-Files"] && Array.isArray(resultFiles["AppExt-Files"]) && resultFiles["AppExt-Files"].length>0 ? true : false; 
+    await chrome.storage.local.set({ "AppExt-Files": [] })
+    await chrome.storage.local.set({ "clipboard-AppExt": 'reset' })
+  }
   
-    if(!haveFiles && !haveMessages){
-      clearDataMessages(false);
-      clearDataFiles(false)
-    }
+  // const needAGeneralReset = (messagesStore:any, mediaFilesStore:any) => {
+  const needAGeneralReset = async () => {
+    console.log('@> needAGeneralReset')
+    const resultClipboard = await chrome.storage.local.get("clipboard-AppExt");
+    const resultFiles = await chrome.storage.local.get("AppExt-Files");    
+    const haveMessages = resultClipboard["clipboard-AppExt"] && Array.isArray(resultClipboard["clipboard-AppExt"]) && resultClipboard["clipboard-AppExt"].length>0; 
+    const haveFiles = resultFiles["AppExt-Files"] && Array.isArray(resultFiles["AppExt-Files"]) && resultFiles["AppExt-Files"].length>0; 
+    
+    // const haveMessages = messagesStore && Array.isArray(messagesStore) && messagesStore.length>0 ? true : false
+    // const haveFiles = mediaFilesStore && Array.isArray(mediaFilesStore) && mediaFilesStore.length>0 ? true : false
+    // const haveMessages = messagesStore && Array.isArray(messagesStore) && messagesStore.length > 0;
+    // const haveFiles = mediaFilesStore && Array.isArray(mediaFilesStore) && mediaFilesStore.length > 0;
+
+    console.log(`@> needAGeneralReset - haveFiles:${haveFiles} && haveMessages:${haveMessages}`);
+
+    if(haveFiles === false && haveMessages=== false){
+      return true
+    }else{
+      return false
+    }    
   }
 
+  const clearDataMessages = async (listIDs: any[] | undefined) => {    
+      console.log('@> clearDataMessages - listIDs:', listIDs)          
+      unselectCheckboxes(listIDs)
+      setMessages([]);
+      // setCopiedText(null)
+      // clearOutput();
+      await chrome.storage.local.set({ "clipboard-AppExt": 'reset' })    
+  };
+  const clearDataFiles = async (listIDs: any[] | undefined) => {              
+      console.log('@> clearDataFiles - listIDs:', listIDs)
+      unselectCheckboxes(listIDs)  
+      setMediaList([]);
+      await chrome.storage.local.set({ "AppExt-Files": [] })    
+  };
   // const clearOutput = () => {
   //   const output = document.querySelector("#output")
   //     ? document.querySelector("#output")
@@ -466,7 +543,7 @@ export function AppExt(): React.ReactElement {
         {/* </div> */}
 
         {((messages && messages.length>0) || (mediaList && mediaList.length>0)) && (            
-            <Button id="cancel" typeButton="danger" onClick={()=>{clearDataMessages(); clearDataFiles();}}>
+            <Button id="cancel" typeButton="danger" onClick={cancelAction}>
               Apagar mensagens
             </Button>
             

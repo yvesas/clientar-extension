@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, {useState} from "react";
 import ReactDOM from "react-dom/client";
 import { ButtonClip } from "../components/ButtonClip";
 import { generateID } from "../shared/generateID";
@@ -11,7 +11,7 @@ export interface AppExtCrmProps {
 }
 
 export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElement {
-  // const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isFirstRender, setIsFirstRender] = useState(true);
 
   const removeClipButtons = async () => {
     try {      
@@ -272,30 +272,42 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       if(newVersion){      
         const ButtonContainer = getParentContainerButtonClipNew()      
         if (ButtonContainer) {
+          console.log('@> SHOW BUTTON [N] start')
           if(await haveNewMessages()){
+            console.log('@> SHOW BUTTON [N] have messages')
             const clipButton =
             ButtonContainer.querySelector("#crx-root-btn");
+            console.log('@> SHOW BUTTON [N] - Exist? ', clipButton)              
             if (clipButton) {
+              console.log('@> SHOW BUTTON [N] - Exist return')              
               return;
-            }else {               
+            }else { 
+              console.log('@> SHOW BUTTON [N] - CREATE')              
               createButtonContainer();  
             }  
           } else {
+            console.log('@> SHOW BUTTON [N] remove_buttons')
             removeClipButtons();            
           }
         }
       }else{
         const ButtonContainer = getParentContainerButtonClipOld()      
         if (ButtonContainer) {
+          console.log('@> SHOW BUTTON [O] start')
           if(await haveNewMessages()){
+            console.log('@> SHOW BUTTON [O] have messages')
             const clipButton =
             document.querySelector("#crx-root-btn");
+            console.log('@> SHOW BUTTON [O] - Exist? ', clipButton)   
             if (clipButton) {
+              console.log('@> SHOW BUTTON [O] - Exist return')              
               return;
-            }else {               
+            }else {
+              console.log('@> SHOW BUTTON [o] - CREATE')                             
               createButtonContainer();  
             }  
           } else {
+            console.log('@> SHOW BUTTON [O] remove_buttons')
             removeClipButtons();            
           }
         }
@@ -375,6 +387,47 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
         "div div.el-upload") as HTMLElement;    
     return ButtonContainer
   }
+  
+  const createBadgeForOldVersion = async (hookElement:HTMLElement) => {
+    try { 
+        hookElement.querySelector("#crx-root-badge")?.remove();                   
+        const root = document.createElement("div");
+        root.id = "crx-root-badge";        
+        hookElement.appendChild(root);
+        hookElement.style.setProperty(
+            "position",
+            "relative",
+            "important"
+          );
+          hookElement.style.setProperty(
+            "display",
+            "inline-flex",
+            "important"
+          );
+
+          // hookElement.addEventListener("click", ()=>{
+          //   console.log('>> HOOK ACTION CLICK!')
+          //   chrome.storage.local.set({ "AppExt-Files": 'It was uploaded.'})
+          // })
+
+          hookElement.parentElement?.addEventListener("click", ()=>{            
+            chrome.storage.local.set({ "AppExt-Files": 'It was uploaded.'})
+          })
+
+          const result = await chrome.storage.local.get("AppExt-Files");
+          const listFiles = result["AppExt-Files"] && Array.isArray(result["AppExt-Files"]) ? result["AppExt-Files"] : [];          
+                    
+          ReactDOM.createRoot(root).render(
+            <React.StrictMode>
+              <BadgeFiles listFiles={listFiles} version="OLD"/>
+            </React.StrictMode>
+          );
+      
+    } catch (err) {
+      console.error("Failed create anchor Badge for new version.", err);
+      return;
+    }
+  }
   const anchorBadgeDownloadOld = () => {
     let ButtonContainer = null
       ButtonContainer = document.querySelector(
@@ -408,7 +461,7 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
             if (badge) {
               return;
             }else {               
-              createButtonContainer();  
+              createBadgeForOldVersion(anchor);  
             }  
           } else {
             removeBadgeUploads();            
@@ -420,12 +473,15 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
       return;
     }
   };
+
   // const observer = new MutationObserver(() => {
+  //   showButtonClip();
+  //   showBadgeFiles();
     // for (const mutation of mutations) {
     //   if (mutation.type === 'childList') {
     //     for (const addedNode of mutation.addedNodes) {
     //       if (addedNode.classList.contains('editor__button')) {    
-    // showButtonClip();
+    //          showButtonClip();
     //       }
     //     }
     //   }
@@ -434,18 +490,18 @@ export function AppExtCRM({ newVersion=true }:AppExtCrmProps): React.ReactElemen
 
   const addListeners = () => {
     try {
-      // if (isFirstRender) {
-      //   setIsFirstRender(false);
-      //   observer.observe(document.body, {
-      //     childList: true,
-      //     subtree: true,
-      //   });
-
-      //   const bodyContainer = document.querySelector("body.main");
-      //   bodyContainer?.addEventListener("mouseover", ()=>{          
-      //     showButtonClip();
-      //   });
-      // }
+      if (isFirstRender) {
+        setIsFirstRender(false);
+        // observer.observe(document.body, {
+        //   childList: true,
+        //   subtree: true,
+        // });
+        const bodyContainer = document.querySelector("body");
+        bodyContainer?.addEventListener("mouseover", ()=>{          
+          showButtonClip();
+          showBadgeFiles();
+        });
+      }
       chrome.storage.onChanged.addListener(
         function(changes) {
           if(changes && changes["clipboard-AppExt"]){
