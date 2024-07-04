@@ -2,7 +2,7 @@
 
 The Extension aims to facilitate the recording of conversations between customers via WhatsApp Web for Clienter CRM. Agility and ease in recording interactions.
 
-Extensão do chrome para a Clientar CRM.
+**Functionality:** With the CRM and WhatsApp tabs open separately, the user can select and copy messages from a WhatsApp conversation. Upon switching to the CRM tab, the extension recognizes specific fields and generates a new button that triggers the pasting action.
 
 ### Run
 
@@ -24,10 +24,7 @@ pnpm install && pnpm dev
 
     e. The extension should now be loaded and active.
 
-
 ---
-
-
 
 ### **Run [em Português]**
 
