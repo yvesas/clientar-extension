@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "1.0.11",
+  "version": "1.0.12",
   "name": "Clientar CRM - Extensão para o WhatsApp Web",
   "description": "Extensão para o agilizar o registro de conversas via WhatsApp Web no CRM.",
   "homepage_url": "https://www.clientarcrm.com.br/",
@@ -15,11 +15,21 @@
     "48": "src/assets/icon_128x128.png",
     "128": "src/assets/icon_128x128.png"
   },
+  "host_permissions":[ "https://*.whatsapp.com/*", "https://*.clientarcrm.com.br/*"],
   "content_scripts": [
     {
       "run_at" : "document_end",
       "matches": ["https://web.whatsapp.com/*", "https://*.clientarcrm.com.br/*"],
       "js": ["src/content/content.tsx"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/content.*"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
